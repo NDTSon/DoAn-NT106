@@ -40,28 +40,34 @@
             // 
             // buttonStart
             // 
+            this.buttonStart.BackColor = System.Drawing.Color.FloralWhite;
             this.buttonStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonStart.ForeColor = System.Drawing.Color.DarkRed;
             this.buttonStart.Location = new System.Drawing.Point(553, 247);
             this.buttonStart.Name = "buttonStart";
             this.buttonStart.Size = new System.Drawing.Size(137, 57);
             this.buttonStart.TabIndex = 0;
             this.buttonStart.Text = "CONNECT";
-            this.buttonStart.UseVisualStyleBackColor = true;
+            this.buttonStart.UseVisualStyleBackColor = false;
             this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
             // 
             // buttonStop
             // 
+            this.buttonStop.BackColor = System.Drawing.Color.FloralWhite;
             this.buttonStop.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonStop.ForeColor = System.Drawing.Color.DarkRed;
             this.buttonStop.Location = new System.Drawing.Point(553, 334);
             this.buttonStop.Name = "buttonStop";
             this.buttonStop.Size = new System.Drawing.Size(137, 57);
             this.buttonStop.TabIndex = 1;
             this.buttonStop.Text = "STOP";
-            this.buttonStop.UseVisualStyleBackColor = true;
+            this.buttonStop.UseVisualStyleBackColor = false;
             this.buttonStop.Click += new System.EventHandler(this.buttonStop_Click);
             // 
             // textBoxMaxTables
             // 
+            this.textBoxMaxTables.BackColor = System.Drawing.Color.FloralWhite;
+            this.textBoxMaxTables.ForeColor = System.Drawing.Color.DarkRed;
             this.textBoxMaxTables.Location = new System.Drawing.Point(675, 129);
             this.textBoxMaxTables.Name = "textBoxMaxTables";
             this.textBoxMaxTables.Size = new System.Drawing.Size(73, 22);
@@ -69,6 +75,8 @@
             // 
             // textBoxMaxUsers
             // 
+            this.textBoxMaxUsers.BackColor = System.Drawing.Color.FloralWhite;
+            this.textBoxMaxUsers.ForeColor = System.Drawing.Color.DarkRed;
             this.textBoxMaxUsers.Location = new System.Drawing.Point(675, 82);
             this.textBoxMaxUsers.Name = "textBoxMaxUsers";
             this.textBoxMaxUsers.Size = new System.Drawing.Size(73, 22);
@@ -77,7 +85,8 @@
             // 
             // listBox1
             // 
-            this.listBox1.BackColor = System.Drawing.SystemColors.ScrollBar;
+            this.listBox1.BackColor = System.Drawing.Color.FloralWhite;
+            this.listBox1.ForeColor = System.Drawing.Color.DarkRed;
             this.listBox1.FormattingEnabled = true;
             this.listBox1.ItemHeight = 16;
             this.listBox1.Location = new System.Drawing.Point(12, 169);
@@ -88,8 +97,9 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.label1.BackColor = System.Drawing.Color.FloralWhite;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.DarkRed;
             this.label1.Location = new System.Drawing.Point(462, 85);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(158, 16);
@@ -100,8 +110,9 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.label2.BackColor = System.Drawing.Color.FloralWhite;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.ForeColor = System.Drawing.Color.DarkRed;
             this.label2.Location = new System.Drawing.Point(462, 132);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(167, 16);
@@ -111,15 +122,16 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.label3.BackColor = System.Drawing.Color.FloralWhite;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 25.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.ForeColor = System.Drawing.Color.DarkRed;
             this.label3.Location = new System.Drawing.Point(47, 82);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(354, 52);
+            this.label3.Size = new System.Drawing.Size(349, 51);
             this.label3.TabIndex = 8;
             this.label3.Text = "GAME SERVER";
             // 
-            // Form1
+            // Server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -134,7 +146,7 @@
             this.Controls.Add(this.textBoxMaxTables);
             this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.buttonStart);
-            this.Name = "Form1";
+            this.Name = "Server";
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);

@@ -41,7 +41,8 @@
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.SystemColors.ScrollBar;
+            this.panel1.BackColor = System.Drawing.Color.BlanchedAlmond;
+            this.panel1.ForeColor = System.Drawing.Color.DarkRed;
             this.panel1.Location = new System.Drawing.Point(12, 133);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(462, 305);
@@ -49,6 +50,8 @@
             // 
             // textBoxLocal
             // 
+            this.textBoxLocal.BackColor = System.Drawing.Color.BlanchedAlmond;
+            this.textBoxLocal.ForeColor = System.Drawing.Color.DarkRed;
             this.textBoxLocal.Location = new System.Drawing.Point(585, 33);
             this.textBoxLocal.Name = "textBoxLocal";
             this.textBoxLocal.Size = new System.Drawing.Size(162, 22);
@@ -56,6 +59,8 @@
             // 
             // textBoxServer
             // 
+            this.textBoxServer.BackColor = System.Drawing.Color.BlanchedAlmond;
+            this.textBoxServer.ForeColor = System.Drawing.Color.DarkRed;
             this.textBoxServer.Location = new System.Drawing.Point(585, 83);
             this.textBoxServer.Name = "textBoxServer";
             this.textBoxServer.Size = new System.Drawing.Size(162, 22);
@@ -63,6 +68,8 @@
             // 
             // textBoxName
             // 
+            this.textBoxName.BackColor = System.Drawing.Color.BlanchedAlmond;
+            this.textBoxName.ForeColor = System.Drawing.Color.DarkRed;
             this.textBoxName.Location = new System.Drawing.Point(157, 33);
             this.textBoxName.Name = "textBoxName";
             this.textBoxName.Size = new System.Drawing.Size(162, 22);
@@ -70,8 +77,9 @@
             // 
             // buttonConnect
             // 
-            this.buttonConnect.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.buttonConnect.BackColor = System.Drawing.Color.BlanchedAlmond;
             this.buttonConnect.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonConnect.ForeColor = System.Drawing.Color.DarkRed;
             this.buttonConnect.Location = new System.Drawing.Point(552, 272);
             this.buttonConnect.Name = "buttonConnect";
             this.buttonConnect.Size = new System.Drawing.Size(162, 76);
@@ -83,8 +91,9 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.BackColor = System.Drawing.SystemColors.ScrollBar;
+            this.label1.BackColor = System.Drawing.Color.BlanchedAlmond;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.DarkRed;
             this.label1.Location = new System.Drawing.Point(49, 36);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(97, 16);
@@ -94,8 +103,9 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.BackColor = System.Drawing.SystemColors.ScrollBar;
+            this.label2.BackColor = System.Drawing.Color.BlanchedAlmond;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.ForeColor = System.Drawing.Color.DarkRed;
             this.label2.Location = new System.Drawing.Point(478, 33);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(84, 25);
@@ -105,8 +115,9 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.BackColor = System.Drawing.SystemColors.ScrollBar;
+            this.label3.BackColor = System.Drawing.Color.BlanchedAlmond;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.ForeColor = System.Drawing.Color.DarkRed;
             this.label3.Location = new System.Drawing.Point(478, 80);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(76, 25);
@@ -115,6 +126,8 @@
             // 
             // listBox1
             // 
+            this.listBox1.BackColor = System.Drawing.Color.BlanchedAlmond;
+            this.listBox1.ForeColor = System.Drawing.Color.DarkRed;
             this.listBox1.FormattingEnabled = true;
             this.listBox1.ItemHeight = 16;
             this.listBox1.Location = new System.Drawing.Point(778, 160);
