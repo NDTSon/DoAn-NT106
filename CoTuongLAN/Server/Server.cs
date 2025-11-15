@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace Server
 {
-    public partial class Form1 : Form
+    public partial class Server : Form
     {
         //Maximum number of people allowed to enter
         private int maxUsers;
@@ -28,7 +28,7 @@ namespace Server
         private int port = 51888;
         private TcpListener myListener;
         private Service service;
-        public Form1()
+        public Server()
         {
             InitializeComponent();
             service = new Service(listBox1);
