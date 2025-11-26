@@ -59,7 +59,7 @@ namespace Client
                 sw = new StreamWriter(ns, Encoding.UTF8) { AutoFlush = true };
 
                 string safeName = fullname.Replace(",", ".");
-                string safeUser = username.Replace(",", ""); 
+                string safeUser = username.Replace(",", "");
                 string safePass = password.Replace(",", "");
                 string safeQuestion = securityQuestion.Replace(",", ".");
                 string safeAnswer = securityAnswer.Replace(",", ".");
@@ -82,13 +82,13 @@ namespace Client
                     else if (splitRes[0] == "RegisterFail")
                     {
                         string reason = splitRes.Length > 1 ? splitRes[1] : "Lỗi không xác định";
-                        MessageBox.Show("Đăng ký thất bại: " + reason, "Lỗi Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Đăng ký thất bại: " + reason, "Lỗi Máy Chủ", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Không thể kết nối tới Server: " + ex.Message, "Lỗi Kết Nối", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Không thể kết nối tới máy chủ: " + ex.Message, "Lỗi Kết Nối", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {

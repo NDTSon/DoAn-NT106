@@ -24,7 +24,7 @@ namespace Client
         {
             if (string.IsNullOrEmpty(targetUser))
             {
-                MessageBox.Show("Lỗi: Không nhận được thông tin tài khoản (targetUser is null).", "Lỗi Hệ Thống", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi: Không nhận được thông tin tài khoản.", "Lỗi Hệ Thống", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
                 return;
             }
@@ -95,7 +95,7 @@ namespace Client
 
                 if (response == "AnswerCorrect")
                 {
-                    MessageBox.Show("Xác thực đúng! Đặt lại mật khẩu ngay.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Xác thực thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                     FormReset f = new FormReset(targetUser);
                     this.Hide();

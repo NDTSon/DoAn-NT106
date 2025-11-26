@@ -17,7 +17,6 @@ namespace Client
             this.listbox = listbox;
             this.sw = sw;
         }
-        // send data to server
         public void SendToServer(string str)
         {
             try
@@ -27,11 +26,10 @@ namespace Client
             }
             catch
             {
-                AddItemToListBox("Failed to send data");
+                AddItemToListBox("Gửi dữ liệu thất bại");
             }
         }
         delegate void ListBoxDelegate(string str);
-        //Write information to listBox
         public void AddItemToListBox(string str)
         {
             if (listbox.InvokeRequired)

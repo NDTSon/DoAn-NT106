@@ -14,7 +14,7 @@ using Server;
 
 namespace Server
 {
-    public partial class Server : Form
+    public partial class FormServer : Form
     {
         DatabaseHelper dbHelper = new DatabaseHelper();
 
@@ -30,13 +30,13 @@ namespace Server
         private int port = 51888;
         private TcpListener myListener;
         private Service service;
-        public Server()
+        public FormServer()
         {
             InitializeComponent();
             service = new Service(listBox1);
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void FormServer_Load(object sender, EventArgs e)
         {
             listBox1.HorizontalScrollbar = true;
             localAddress = IPAddress.Parse("127.0.0.1");
@@ -48,17 +48,17 @@ namespace Server
             if (int.TryParse(textBoxMaxTables.Text, out maxTables) == false
                 || int.TryParse(textBoxMaxUsers.Text, out maxUsers) == false)
             {
-                MessageBox.Show("Please enter a positive integer in the range!!!");
+                MessageBox.Show("Vui lòng nhập số nguyên dương hợp lệ!!!");
                 return;
             }
             if (maxUsers < 1 || maxUsers > 300)
             {
-                MessageBox.Show("The number of people allowed is 1-300!!!");
+                MessageBox.Show("Số lượng người cho phép là 1-300!!!");
                 return;
             }
             if (maxTables < 1 || maxTables > 100)
             {
-                MessageBox.Show("The number of tables allowed is 1-100!!!");
+                MessageBox.Show("Số lượng bàn cho phép là 1-100!!!");
                 return;
             }
             textBoxMaxTables.Enabled = false;
@@ -70,7 +70,7 @@ namespace Server
             }
             myListener = new TcpListener(localAddress, port);
             myListener.Start();
-            service.AddItem(string.Format("Start listening for client connections at {0}:{1}", localAddress, port));
+            service.AddItem(string.Format("Bắt đầu lắng nghe kết nối tại {0}:{1}", localAddress, port));
             Thread myThread = new Thread(new ThreadStart(ListenClientConnect));
             myThread.Start();
             buttonStart.Enabled = false;
@@ -79,8 +79,8 @@ namespace Server
 
         private void buttonStop_Click(object sender, EventArgs e)
         {
-            service.AddItem(string.Format("Number of currently connected users:{0}", userList.Count));
-            service.AddItem(string.Format("Stop the service immediately, the user will exit in sequence"));
+            service.AddItem(string.Format("Số người dùng đang kết nối: {0}", userList.Count));
+            service.AddItem(string.Format("Dừng dịch vụ, ngắt kết nối tất cả người dùng"));
             for (int i = 0; i < userList.Count; i++)
             {
                 userList[i].client.Close();
@@ -104,22 +104,19 @@ namespace Server
                 {
                     break;
                 }
-                // create a thread for each client
                 Thread threadReceive = new Thread(ReceiveData);
                 User user = new User(newClient);
                 threadReceive.Start(user);
                 userList.Add(user);
-                service.AddItem(string.Format("{0}Enter", newClient.Client.RemoteEndPoint));
-                service.AddItem(string.Format("Number of currently connected users: {0}", userList.Count));
+                service.AddItem(string.Format("{0} đã kết nối", newClient.Client.RemoteEndPoint));
+                service.AddItem(string.Format("Số người dùng hiện tại: {0}", userList.Count));
             }
         }
         private void ReceiveData(object obj)
         {
             User user = (User)obj;
             TcpClient client = user.client;
-            //Whether to exit the receiving thread normally
             bool normalExit = false;
-            //Used to control whether to exit the loop
             bool exitWhile = false;
             while (exitWhile == false)
             {
@@ -130,7 +127,7 @@ namespace Server
                 }
                 catch
                 {
-                    service.AddItem("Failed to receive data");
+                    service.AddItem("Nhận dữ liệu thất bại");
                 }
                 if (receiveString == null)
                 {
@@ -138,13 +135,13 @@ namespace Server
                     {
                         if (client.Connected == true)
                         {
-                            service.AddItem(string.Format("lost contact with {0}, has terminated receiving the user information", client.Client.RemoteEndPoint));
+                            service.AddItem(string.Format("Mất kết nối với {0}, đã dừng nhận thông tin", client.Client.RemoteEndPoint));
                         }
                         RemoveClientfromPlayer(user);
                     }
                     break;
                 }
-                service.AddItem(string.Format("from {0}:{1}", user.userName, receiveString));
+                service.AddItem(string.Format("Từ {0}:{1}", user.userName, receiveString));
                 string[] splitString = receiveString.Split(',');
                 int tableIndex = -1;
                 int side = -1;
@@ -186,7 +183,7 @@ namespace Server
                             else
                             {
                                 service.SendToOne(user, "LoginFailed,Sai tài khoản hoặc mật khẩu");
-                                service.AddItem(string.Format("{0} đăng nhập thất bại (sai pass)", loginUser));
+                                service.AddItem(string.Format("{0} đăng nhập thất bại (sai mật khẩu)", loginUser));
                                 exitWhile = true;
                             }
                         }
@@ -231,13 +228,11 @@ namespace Server
                             service.SendToOne(user, "UserNotExist");
                         }
                         break;
-                    //Exit, format: Logout
                     case "logout":
-                        service.AddItem(string.Format("{0} exit the game room", user.userName));
+                        service.AddItem(string.Format("{0} thoát khỏi phòng game", user.userName));
                         normalExit = true;
                         exitWhile = true;
                         break;
-                    //Sit down, format: SitDown, table number, seat number
                     case "sitdown":
                         tableIndex = int.Parse(splitString[1]);
                         side = int.Parse(splitString[2]);
@@ -245,30 +240,21 @@ namespace Server
                         gameTable[tableIndex].gamePlayer[side].someone = true;
                         service.AddItem(string.Format("{0} ngồi vào bàn {1}, ghế {2}", user.userName, tableIndex + 1, side));
 
-                        //Get the seat number of the other party
                         anotherSide = (side + 1) % 2;
-                        // Determine if the other party is someone
                         if (gameTable[tableIndex].gamePlayer[anotherSide].someone == true)
                         {
-                            // Tell the user that the other party is seated
-                            //Format: SitDown, seat number, username
                             sendString = string.Format("SitDown,{0},{1}", anotherSide,
                                             gameTable[tableIndex].gamePlayer[anotherSide].user.userName);
                             service.SendToOne(user, sendString);
                         }
-                        //Tell both users that the user is seated
-                        //Format: SitDown, seat number, username
                         sendString = string.Format("SitDown,{0},{1}", side, user.userName);
                         service.SendToBoth(gameTable[tableIndex], sendString);
-                        //Send the status of each table in the game room to all users
                         service.SendToAll(userList, "Tables," + this.GetOnlineString());
                         break;
-                    //Leave seat, format: GetUp, table number, seat number
                     case "getup":
                         tableIndex = int.Parse(splitString[1]);
                         side = int.Parse(splitString[2]);
-                        service.AddItem(string.Format("{0} leave seat and return to the game room", user.userName));
-                        //Send the departure information to two users in the format: GetUp, seat number, user name
+                        service.AddItem(string.Format("{0} rời ghế quay lại phòng chờ", user.userName));
                         service.SendToBoth(gameTable[tableIndex], string.Format("GetUp,{0},{1}", side, user.userName));
                         gameTable[tableIndex].gamePlayer[side].someone = false;
                         gameTable[tableIndex].gamePlayer[side].started = false;
@@ -277,18 +263,14 @@ namespace Server
                         {
                             gameTable[tableIndex].gamePlayer[anotherSide].started = false;
                         }
-                        //Send the status of each table in the game room to all users
                         service.SendToAll(userList, "Tables," + this.GetOnlineString());
                         break;
-                    //chat, format: Talk, username, conversation content
                     case "talk":
                         tableIndex = int.Parse(splitString[1]);
-                        //special handling of commas
                         sendString = string.Format("Talk,{0},{1}", user.userName,
                                     receiveString.Substring(splitString[0].Length + splitString[1].Length + 2));
                         service.SendToBoth(gameTable[tableIndex], sendString);
                         break;
-                    //Prepare, format: Start, table number, seat number
                     case "start":
                         tableIndex = int.Parse(splitString[1]);
                         side = int.Parse(splitString[2]);
@@ -296,12 +278,12 @@ namespace Server
                         if (side == 0)
                         {
                             anotherSide = 1;
-                            sendString = "Message, Black is ready";
+                            sendString = "Message, Phe Đen đã sẵn sàng";
                         }
                         else
                         {
                             anotherSide = 0;
-                            sendString = "Message, the red team is ready";
+                            sendString = "Message, Phe Đỏ đã sẵn sàng";
                         }
                         service.SendToBoth(gameTable[tableIndex], sendString);
                         if (gameTable[tableIndex].gamePlayer[anotherSide].started == true)
@@ -310,14 +292,13 @@ namespace Server
                             service.SendToBoth(gameTable[tableIndex], sendString);
                         }
                         break;
-                    //chess piece movement information, format: ChessInfo, table number, seat number, piece number, original x, original y, purpose x, purpose y
                     case "chessinfo":
                         tableIndex = int.Parse(splitString[1]);
                         side = int.Parse(splitString[2]);
                         anotherSide = (side + 1) % 2;
-                        int cno;//Pawn number
-                        int x0, y0;//Original coordinates
-                        int x1, y1;//Destination coordinates
+                        int cno;
+                        int x0, y0;
+                        int x1, y1;
                         cno = int.Parse(splitString[3]);
                         x0 = ChangeX(int.Parse(splitString[4]));
                         y0 = ChangeY(int.Parse(splitString[5]));
@@ -326,15 +307,14 @@ namespace Server
                         sendString = string.Format("ChessInfo,{0},{1},{2},{3},{4},{5}", side, int.Parse(splitString[3]),
                              int.Parse(splitString[4]), int.Parse(splitString[5]), int.Parse(splitString[6]), int.Parse(splitString[7]));
                         service.SendToOne(gameTable[tableIndex].gamePlayer[side].user, sendString);
-                        service.AddItem(string.Format("{0}:{1}:From ({2},{3}) -> ({4},{5})", gameTable[tableIndex].gamePlayer[side].user.userName,
+                        service.AddItem(string.Format("{0}:{1}:Từ ({2},{3}) -> ({4},{5})", gameTable[tableIndex].gamePlayer[side].user.userName,
                             int.Parse(splitString[3]), int.Parse(splitString[4]), int.Parse(splitString[5]),
                             int.Parse(splitString[6]), int.Parse(splitString[7])));
                         sendString = string.Format("ChessInfo,{0},{1},{2},{3},{4},{5}", side, cno, x0, y0, x1, y1);
                         service.SendToOne(gameTable[tableIndex].gamePlayer[anotherSide].user, sendString);
-                        service.AddItem(string.Format("{0}:{1}:From ({2},{3}) -> ({4},{5})", gameTable[tableIndex].gamePlayer[anotherSide].user.userName,
+                        service.AddItem(string.Format("{0}:{1}:Từ ({2},{3}) -> ({4},{5})", gameTable[tableIndex].gamePlayer[anotherSide].user.userName,
                             cno, x0, y0, x1, y1));
                         break;
-                    //Victory, format: Win, table number, seat number
                     case "win":
                         tableIndex = int.Parse(splitString[1]);
                         side = int.Parse(splitString[2]);
@@ -353,7 +333,7 @@ namespace Server
                         if (resetOk)
                         {
                             service.SendToOne(user, "ResetSuccess");
-                            service.AddItem(string.Format("User {0} đã đổi mật khẩu thành công", rUser));
+                            service.AddItem(string.Format("Người dùng {0} đã đổi mật khẩu thành công", rUser));
                         }
                         else
                         {
@@ -363,8 +343,6 @@ namespace Server
                     case "register":
                         try
                         {
-                            // Client gửi: Register,username,password,fullname,question,answer
-                            // splitString[0] là lệnh "Register"
                             if (splitString.Length < 6)
                             {
                                 service.SendToOne(user, "RegisterFail,Thiếu thông tin");
@@ -377,9 +355,8 @@ namespace Server
                             string regQuest = splitString[4];
                             string regAns = splitString[5];
 
-                            service.AddItem(string.Format("Đang đăng ký user: {0}", regUser));
+                            service.AddItem(string.Format("Đang đăng ký người dùng: {0}", regUser));
 
-                            // Gọi hàm RegisterUser đã sửa ở DatabaseHelper
                             bool isRegistered = dbHelper.RegisterUser(regUser, regPass, regName, regQuest, regAns);
 
                             if (isRegistered)
@@ -396,25 +373,23 @@ namespace Server
                         catch (Exception ex)
                         {
                             service.SendToOne(user, "RegisterFail,Lỗi xử lý server");
-                            service.AddItem("Lỗi Register: " + ex.Message);
+                            service.AddItem("Lỗi Đăng ký: " + ex.Message);
                         }
                         break;
                 }
             }
             userList.Remove(user);
             client.Close();
-            service.AddItem(string.Format("There is one exit, remaining connected users: {0}", userList.Count));
+            service.AddItem(string.Format("Một người dùng đã thoát, số người dùng còn lại: {0}", userList.Count));
         }
         private int ChangeY(int x)
         {
             return x + 2 * (4 - x);
         }
-        //Transform the vertical coordinates of the pieces
         private int ChangeX(int y)
         {
             return y + 2 * (4 - y) + 1;
         }
-        //Detect if the user is sitting on the game table, if so, remove it and terminate the table game
         private void RemoveClientfromPlayer(User user)
         {
             for (int i = 0; i < gameTable.Length; i++)
@@ -461,22 +436,12 @@ namespace Server
             return str;
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void FormServer_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (myListener != null)
             {
                 buttonStop_Click(null, null);
             }
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBoxMaxUsers_TextChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }
