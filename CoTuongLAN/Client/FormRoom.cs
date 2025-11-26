@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace Client
 {
-    public partial class Form1 : Form
+    public partial class FormRoom : Form
     {
         private int maxPlayingTables;
         private CheckBox[,] checkBoxGameTables;
@@ -22,51 +22,87 @@ namespace Client
         private StreamReader sr;
         private Service service;
         private FormPlaying formPlaying;
-        //Whether to exit the receiving thread normally
+
+        // Biến lưu tên người dùng
+        private string myUserName;
+        // Biến lưu chuỗi trạng thái bàn cờ ban đầu nhận từ FormLogin
+        private string _initialTableData;
+
         private bool normalExit = false;
-        // whether the command is from the server
         private bool isReceiveCommand = false;
-        //The seat number of the game table you are sitting on, -1 means not seated, 0 means black, 1 means red
+
+        // Lưu vị trí ngồi hiện tại
         private int side = -1;
-        public Form1()
+        private int tableIndex = -1; // Lưu bàn số mấy
+
+        // Cập nhật Constructor: Nhận thêm chuỗi strTables từ FormLogin
+        public FormRoom(TcpClient client, string userName, string strTables)
         {
             InitializeComponent();
-        }
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            Random r = new Random((int)DateTime.Now.Ticks);
-            textBoxName.Text = "Player" + r.Next(1, 100);
-            maxPlayingTables = 0;
-            textBoxLocal.ReadOnly = true;
-            textBoxServer.ReadOnly = true;
-        }
+            this.client = client;
+            this.myUserName = userName;
+            this._initialTableData = strTables; // Lưu lại để xử lý khi Load
 
-        private void buttonConnect_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                client = new TcpClient("127.0.0.1", 51888);
-            }
-            catch
-            {
-                MessageBox.Show("Failed to connect to the server", "",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            textBoxLocal.Text = client.Client.LocalEndPoint.ToString();
-            textBoxServer.Text = client.Client.RemoteEndPoint.ToString();
-            buttonConnect.Enabled = false;
-            // get network stream
             NetworkStream netStream = client.GetStream();
             sr = new StreamReader(netStream, System.Text.Encoding.UTF8);
-            sw = new StreamWriter(netStream, System.Text.Encoding.UTF8);
+            sw = new StreamWriter(netStream, System.Text.Encoding.UTF8) { AutoFlush = true };
+
             service = new Service(listBox1, sw);
-            //Get the server table information
-            //Format: Login, nickname
-            service.SendToServer("Login," + textBoxName.Text.Trim());
-            Thread threadReceive = new Thread(new ThreadStart(ReceiveData));
-            threadReceive.Start();
         }
+
+        private void FormRoom_Load(object sender, EventArgs e)
+        {
+            textBoxName.Text = this.myUserName;
+            textBoxName.ReadOnly = true;
+
+            // Mặc định chưa ngồi thì chưa cho Ready
+            if (buttonReady != null)
+            {
+                buttonReady.Visible = true;
+                buttonReady.Enabled = false;
+                buttonReady.Text = "Sẵn sàng (Ready)";
+            }
+
+            maxPlayingTables = 0;
+
+            if (client != null && client.Connected)
+            {
+                textBoxLocal.Text = client.Client.LocalEndPoint.ToString();
+                textBoxServer.Text = client.Client.RemoteEndPoint.ToString();
+
+                // XỬ LÝ NGAY chuỗi bàn cờ nhận được từ FormLogin
+                // Vì chuỗi này có dạng "Tables,101010..." nên ta cần tách ra
+                if (!string.IsNullOrEmpty(_initialTableData))
+                {
+                    string[] parts = _initialTableData.Split(',');
+                    if (parts.Length > 1 && parts[0] == "Tables")
+                    {
+                        ProcessTableData(parts[1]);
+                    }
+                }
+
+                // Sau đó mới bắt đầu lắng nghe các tin tiếp theo
+                Thread threadReceive = new Thread(new ThreadStart(ReceiveData));
+                threadReceive.IsBackground = true;
+                threadReceive.Start();
+            }
+        }
+
+        // Logic mới: Bấm Ready -> Gửi lệnh Start -> Chờ Server báo AllReady mới mở Form
+        private void buttonReady_Click(object sender, EventArgs e)
+        {
+            if (side != -1 && tableIndex != -1)
+            {
+                // Gửi lệnh Start cho Server (Format theo Server cũ: Start,Table,Side)
+                service.SendToServer(string.Format("Start,{0},{1}", tableIndex, side));
+
+                // Disable nút để tránh bấm nhiều lần
+                buttonReady.Enabled = false;
+                buttonReady.Text = "Đang chờ đối thủ...";
+                service.AddItemToListBox("Đã sẵn sàng, vui lòng chờ đối thủ...");
+            }
+        }
+
         private void ReceiveData()
         {
             bool exitWhile = false;
@@ -81,246 +117,230 @@ namespace Client
                 {
                     service.AddItemToListBox("Failed to receive data");
                 }
+
                 if (receiveString == null)
                 {
                     if (normalExit == false)
                     {
-                        MessageBox.Show("Lost contact with server, game cannot continue!");
+                        MessageBox.Show("Mất kết nối với Server!");
                     }
-                    if (side != 1)
-                    {
-                        ExitFormPlaying();
-                    }
+                    if (side != -1) ExitFormPlaying();
                     side = -1;
                     normalExit = true;
                     break;
                 }
-                service.AddItemToListBox("Received:" + receiveString);
+
                 string[] splitString = receiveString.Split(',');
                 string command = splitString[0].ToLower();
+
                 switch (command)
                 {
-                    //The lobby is full
                     case "sorry":
-                        MessageBox.Show("Successful connection, but the lobby is full");
+                        MessageBox.Show("Phòng đã đầy!");
                         exitWhile = true;
                         break;
-                    // game table situation
-                    //Format: Tables, string of whether there are people at each table
-                    //1 means someone, 0 means nobody
+
                     case "tables":
+                        // Cập nhật trạng thái bàn cờ từ Server
                         string s = splitString[1];
-                        //If maxPlayingTables is 0, it means checkBoxGameTables has not been created
-                        if (maxPlayingTables == 0)
-                        {
-                            // count the number of tables
-                            maxPlayingTables = s.Length / 2;
-                            checkBoxGameTables = new CheckBox[maxPlayingTables, 2];
-                            isReceiveCommand = true;
-                            //Add the CheckBox object to the array
-                            for (int i = 0; i < maxPlayingTables; i++)
-                            {
-                                AddCheckBoxToPanel(s, i);
-                            }
-                            isReceiveCommand = false;
-                        }
-                        else
-                        {
-                            isReceiveCommand = true;
-                            for (int i = 0; i < maxPlayingTables; i++)
-                            {
-                                for (int j = 0; j < 2; j++)
-                                {
-                                    if (s[2 * i + j] == '0')
-                                    {
-                                        UpdateCheckBox(checkBoxGameTables[i, j], false);
-                                    }
-                                    else
-                                    {
-                                        UpdateCheckBox(checkBoxGameTables[i, j], true);
-                                    }
-                                }
-                                isReceiveCommand = false;
-                            }
-                        }
+                        ProcessTableData(s);
                         break;
-                    //Seat, format: SitDown, seat number, user name
+
                     case "sitdown":
-                        formPlaying.SetTableSideText(splitString[1], splitString[2],
-                                               string.Format("{0} enters", splitString[2]));
-                        break;
-                    // leave seat
-                    case "getup":
-                        int getupSide = int.Parse(splitString[1]);
-                        // If the getup message refers to this client's seat, close and clear the playing form
-                        if (side == getupSide)
-                        {
-                            side = -1;
-                            try
-                            {
-                                if (formPlaying != null && !formPlaying.IsDisposed)
-                                {
-                                    if (formPlaying.InvokeRequired)
-                                    {
-                                        formPlaying.Invoke(new Action(() => formPlaying.Close()));
-                                    }
-                                    else
-                                    {
-                                        formPlaying.Close();
-                                    }
-                                }
-                            }
-                            catch { }
-                            formPlaying = null;
-                        }
-                        else
-                        {
-                            formPlaying.SetTableSideText(splitString[1], "",
-                                string.Format("{0} exit", splitString[2]));
-                            if (formPlaying.InvokeRequired)
-                            {
-                                formPlaying.Invoke(new Action(() => formPlaying.Restart("The enemy escapes, our side wins")));
-                            }
-                            else
-                            {
-                                formPlaying.Restart("The enemy escapes, our side wins");
-                            }
-                        }
-                        break;
-                    //The other party disconnects from the server
-                    case "lost":
-                        formPlaying.SetTableSideText(splitString[1], "",
-                            string.Format("[{0}] lost contact with server", splitString[2]));
-                        if (formPlaying.InvokeRequired)
-                        {
-                            formPlaying.Invoke(new Action(() => formPlaying.Restart("The opponent lost contact with the server and the game cannot continue")));
-                        }
-                        else
-                        {
-                            formPlaying.Restart("The opponent lost contact with the server and the game cannot continue");
-                        }
-                        break;
-                    //chat
-                    //Format: Talk, Speaker, Content
-                    case "talk":
+                        // Có người ngồi xuống
+                        // Nếu đang mở FormPlaying (đã vào game) thì cập nhật tên
                         if (formPlaying != null)
                         {
-                            formPlaying.ShowTalk(splitString[1],
-                                receiveString.Substring(splitString[0].Length +
-                                splitString[1].Length + 2));
-                        }
-                        break;
-                    // information sent by the server
-                    //Format: Message, information
-                    case "message":
-                        formPlaying.ShowMessage(splitString[1]);
-                        break;
-                    //Pawn change information, format: ChessInfo, side, piece number, original x, original y, purpose x, purpose y
-                    case "chessinfo":
-                        int tside, cno, oriX, oriY, endX, endY;
-                        tside = int.Parse(splitString[1]);
-                        cno = int.Parse(splitString[2]);
-                        oriX = int.Parse(splitString[3]);
-                        oriY = int.Parse(splitString[4]);
-                        endX = int.Parse(splitString[5]);
-                        endY = int.Parse(splitString[6]);
-                        // These update the UI — ensure we run them on the UI thread to avoid race
-                        if (formPlaying.InvokeRequired)
-                        {
-                            formPlaying.Invoke(new Action(() =>
-                            {
-                                formPlaying.ChangeChess(-1, oriX, oriY);
-                                formPlaying.ChangeChess(cno, endX, endY);
-                                formPlaying.RePaint();
-                                formPlaying.drawFrame("blue", endX, endY);
-                                formPlaying.ChangeOrder(tside);
-                                formPlaying.CheckWin();
-                            }));
+                            formPlaying.SetTableSideText(splitString[1], splitString[2],
+                                            string.Format("{0} đã vào bàn", splitString[2]));
                         }
                         else
                         {
-                            formPlaying.ChangeChess(-1, oriX, oriY);
-                            formPlaying.ChangeChess(cno, endX, endY);
-                            formPlaying.RePaint();
-                            formPlaying.drawFrame("blue", endX, endY);
-                            formPlaying.ChangeOrder(tside);
-                            formPlaying.CheckWin();
+                            // Nếu ở ngoài sảnh, chỉ log ra
+                            service.AddItemToListBox(string.Format("Bàn {0}: {1} đã ngồi vào ghế {2}",
+                                int.Parse(splitString[1]) + 1, splitString[2], splitString[1]));
                         }
                         break;
-                    //Victory, format: Win, side
-                    case "win":
-                        int winner = int.Parse(splitString[1]);
-                        formPlaying.ShowForm(winner);
 
+                    case "getup":
+                        // Xử lý khi có người rời bàn
+                        int getupSide = int.Parse(splitString[1]);
+                        if (side == getupSide) // Chính mình rời
+                        {
+                            side = -1;
+                            tableIndex = -1;
+                            ExitFormPlaying();
+                            formPlaying = null;
+
+                            // Reset lại nút Ready
+                            Invoke(new Action(() => {
+                                buttonReady.Enabled = false;
+                                buttonReady.Text = "Sẵn sàng (Ready)";
+                            }));
+                        }
+                        else // Đối thủ rời
+                        {
+                            if (formPlaying != null)
+                            {
+                                Invoke(new Action(() => formPlaying.Restart("Đối thủ đã thoát, bạn thắng!")));
+                            }
+                        }
                         break;
-                    //both sides are ready
+
+                    // QUAN TRỌNG: Server báo cả 2 đã sẵn sàng
                     case "allready":
-                        formPlaying.ShowMessage("Both sides are ready, the game starts!");
-                        formPlaying.Ready(side);
+                        // Lúc này mới MỞ FORM PLAYING
+                        Invoke(new Action(() => {
+                            if (formPlaying == null || formPlaying.IsDisposed)
+                            {
+                                formPlaying = new FormPlaying(tableIndex, side, sw);
+                                formPlaying.Text = string.Format("Bàn {0} - Phe {1} - {2}",
+                                    tableIndex + 1, side == 0 ? "Đen" : "Đỏ", myUserName);
+                                formPlaying.Show();
+                            }
+                            formPlaying.ShowMessage("Hai bên đã sẵn sàng, Ván đấu bắt đầu!");
+                            formPlaying.Ready(side);
+
+                            // Ẩn FormRoom đi cho đỡ rối (tùy chọn)
+                            // this.Hide(); 
+                        }));
+                        break;
+
+                    // Các lệnh xử lý trong game (chuyển tiếp vào FormPlaying)
+                    case "talk":
+                        if (formPlaying != null)
+                            formPlaying.ShowTalk(splitString[1], receiveString.Substring(splitString[0].Length + splitString[1].Length + 2));
+                        break;
+
+                    case "message":
+                        // Server báo: Đen đã sẵn sàng / Đỏ đã sẵn sàng
+                        string msg = splitString[1];
+                        service.AddItemToListBox(msg);
+                        if (formPlaying != null) formPlaying.ShowMessage(msg);
+                        break;
+
+                    case "chessinfo":
+                        if (formPlaying != null)
+                        {
+                            // Xử lý nước cờ
+                            int tside = int.Parse(splitString[1]);
+                            int cno = int.Parse(splitString[2]);
+                            int oriX = int.Parse(splitString[3]);
+                            int oriY = int.Parse(splitString[4]);
+                            int endX = int.Parse(splitString[5]);
+                            int endY = int.Parse(splitString[6]);
+
+                            if (formPlaying.InvokeRequired)
+                            {
+                                formPlaying.Invoke(new Action(() =>
+                                {
+                                    formPlaying.ChangeChess(-1, oriX, oriY);
+                                    formPlaying.ChangeChess(cno, endX, endY);
+                                    formPlaying.RePaint();
+                                    formPlaying.drawFrame("blue", endX, endY);
+                                    formPlaying.ChangeOrder(tside);
+                                    formPlaying.CheckWin();
+                                }));
+                            }
+                        }
+                        break;
+
+                    case "win":
+                        if (formPlaying != null)
+                        {
+                            int winner = int.Parse(splitString[1]);
+                            formPlaying.ShowForm(winner);
+                        }
                         break;
                 }
             }
             Application.Exit();
         }
-        delegate void ExitFormPlayingDelegate();
-        //exit the game
-        private void ExitFormPlaying()
+
+        // Tách hàm xử lý vẽ bàn cờ để dùng chung cho Load và ReceiveData
+        private void ProcessTableData(string s)
         {
-            if (formPlaying.InvokeRequired == true)
+            if (maxPlayingTables == 0)
             {
-                ExitFormPlayingDelegate d = new ExitFormPlayingDelegate(ExitFormPlaying);
-                this.Invoke(d);
+                maxPlayingTables = s.Length / 2;
+                checkBoxGameTables = new CheckBox[maxPlayingTables, 2];
+                isReceiveCommand = true;
+                for (int i = 0; i < maxPlayingTables; i++)
+                {
+                    AddCheckBoxToPanel(s, i);
+                }
+                isReceiveCommand = false;
             }
             else
             {
-                formPlaying.Close();
+                isReceiveCommand = true;
+                for (int i = 0; i < maxPlayingTables; i++)
+                {
+                    for (int j = 0; j < 2; j++)
+                    {
+                        if (s[2 * i + j] == '0')
+                            UpdateCheckBox(checkBoxGameTables[i, j], false); // Trống
+                        else
+                            UpdateCheckBox(checkBoxGameTables[i, j], true); // Có người
+                    }
+                }
+                isReceiveCommand = false;
             }
         }
+
+        delegate void ExitFormPlayingDelegate();
+        private void ExitFormPlaying()
+        {
+            if (formPlaying != null)
+            {
+                if (formPlaying.InvokeRequired)
+                {
+                    Invoke(new Action(ExitFormPlaying));
+                }
+                else
+                {
+                    formPlaying.Close();
+                }
+            }
+        }
+
         delegate void Paneldelegate(string s, int i);
-        //Add a game table
         private void AddCheckBoxToPanel(string s, int i)
         {
-            if (panel1.InvokeRequired == true)
+            if (panel1.InvokeRequired)
             {
-                Paneldelegate d = AddCheckBoxToPanel;
-                this.Invoke(d, s, i);
+                this.Invoke(new Paneldelegate(AddCheckBoxToPanel), s, i);
             }
             else
             {
                 Label label = new Label();
                 label.Location = new Point(10, 15 + i * 30);
-                label.Text = string.Format("Table {0}: ", i + 1);
+                label.Text = string.Format("Bàn {0}: ", i + 1);
                 label.Width = 70;
                 this.panel1.Controls.Add(label);
-                CreateCheckBox(i, 1, s, "Red");
-                CreateCheckBox(i, 0, s, "Black");
 
+                CreateCheckBox(i, 1, s, "Đỏ");
+                CreateCheckBox(i, 0, s, "Đen");
             }
         }
+
         delegate void CheckBoxDelegate(CheckBox checkbox, bool isChecked);
-        //Modify the selection state
         private void UpdateCheckBox(CheckBox checkbox, bool isChecked)
         {
-            if (checkbox.InvokeRequired == true)
+            if (checkbox.InvokeRequired)
             {
-                CheckBoxDelegate d = UpdateCheckBox;
-                this.Invoke(d, checkbox, isChecked);
+                this.Invoke(new CheckBoxDelegate(UpdateCheckBox), checkbox, isChecked);
             }
             else
             {
                 if (side == -1)
-                {
                     checkbox.Enabled = !isChecked;
-                }
                 else
-                {
-                    //Already seated, no other tables are allowed
                     checkbox.Enabled = false;
-                }
                 checkbox.Checked = isChecked;
             }
         }
-        // Option to add game table seats
+
         private void CreateCheckBox(int i, int j, string s, string text)
         {
             int x = j == 0 ? 100 : 200;
@@ -330,61 +350,45 @@ namespace Client
             checkBoxGameTables[i, j].Location = new Point(x, 10 + i * 30);
             checkBoxGameTables[i, j].Text = text;
             checkBoxGameTables[i, j].TextAlign = ContentAlignment.MiddleLeft;
+
             if (s[2 * i + j] == '1')
             {
-                //1 means someone
                 checkBoxGameTables[i, j].Enabled = false;
                 checkBoxGameTables[i, j].Checked = true;
             }
             else
             {
-                //0 means no one
                 checkBoxGameTables[i, j].Enabled = true;
                 checkBoxGameTables[i, j].Checked = false;
             }
+
             this.panel1.Controls.Add(checkBoxGameTables[i, j]);
-            checkBoxGameTables[i, j].CheckedChanged +=
-                 new EventHandler(checkBox_CheckedChanged);
+            checkBoxGameTables[i, j].CheckedChanged += new EventHandler(checkBox_CheckedChanged);
         }
+
         private void checkBox_CheckedChanged(object sender, EventArgs e)
         {
-            //Whether to update the table status for the server
-            if (isReceiveCommand == true)
-            {
-                return;
-            }
+            if (isReceiveCommand == true) return;
+
             CheckBox checkbox = (CheckBox)sender;
-            //If Checked is true, it means that the player sits on the jth table at the ith table
             if (checkbox.Checked == true)
             {
                 int i = int.Parse(checkbox.Name.Substring(5, 4));
                 int j = int.Parse(checkbox.Name.Substring(9, 4));
-                // if there is an existing playing form, close it before creating a new one
-                try
-                {
-                    if (formPlaying != null && !formPlaying.IsDisposed)
-                    {
-                        if (formPlaying.InvokeRequired)
-                        {
-                            formPlaying.Invoke(new Action(() => formPlaying.Close()));
-                        }
-                        else
-                        {
-                            formPlaying.Close();
-                        }
-                        formPlaying = null;
-                    }
-                }
-                catch { /* ignore errors closing previous form */ }
 
+                // Cập nhật trạng thái
                 side = j;
-                //Format: SitDown, Nickname, Table Number, Seat Number
+                tableIndex = i;
+
+                // Gửi lệnh ngồi xuống
                 service.SendToServer(string.Format("SitDown,{0},{1}", i, j));
-                formPlaying = new FormPlaying(i, j, sw);
-                formPlaying.Show();
-                formPlaying.RePaint();
+
+                // THAY ĐỔI: Không mở FormPlaying ngay
+                // Mà chỉ bật nút Ready để người chơi xác nhận
+                buttonReady.Enabled = true;
+                buttonReady.Text = "BẮT ĐẦU (READY)";
+                service.AddItemToListBox(string.Format("Bạn đã chọn bàn {0}, phe {1}. Hãy bấm Ready!", i + 1, j == 0 ? "Đen" : "Đỏ"));
             }
         }
-
     }
 }

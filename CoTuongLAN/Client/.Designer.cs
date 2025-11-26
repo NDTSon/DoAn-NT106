@@ -1,6 +1,6 @@
 ﻿namespace Client
 {
-    partial class Form1
+    partial class FormRoom
     {
         /// <summary>
         /// Required designer variable.
@@ -32,7 +32,7 @@
             this.textBoxLocal = new System.Windows.Forms.TextBox();
             this.textBoxServer = new System.Windows.Forms.TextBox();
             this.textBoxName = new System.Windows.Forms.TextBox();
-            this.buttonConnect = new System.Windows.Forms.Button();
+            this.buttonReady = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -54,6 +54,7 @@
             this.textBoxLocal.ForeColor = System.Drawing.Color.DarkRed;
             this.textBoxLocal.Location = new System.Drawing.Point(585, 33);
             this.textBoxLocal.Name = "textBoxLocal";
+            this.textBoxLocal.ReadOnly = true;
             this.textBoxLocal.Size = new System.Drawing.Size(162, 22);
             this.textBoxLocal.TabIndex = 1;
             // 
@@ -63,6 +64,7 @@
             this.textBoxServer.ForeColor = System.Drawing.Color.DarkRed;
             this.textBoxServer.Location = new System.Drawing.Point(585, 83);
             this.textBoxServer.Name = "textBoxServer";
+            this.textBoxServer.ReadOnly = true;
             this.textBoxServer.Size = new System.Drawing.Size(162, 22);
             this.textBoxServer.TabIndex = 2;
             // 
@@ -75,18 +77,18 @@
             this.textBoxName.Size = new System.Drawing.Size(162, 22);
             this.textBoxName.TabIndex = 3;
             // 
-            // buttonConnect
+            // buttonReady
             // 
-            this.buttonConnect.BackColor = System.Drawing.Color.BlanchedAlmond;
-            this.buttonConnect.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonConnect.ForeColor = System.Drawing.Color.DarkRed;
-            this.buttonConnect.Location = new System.Drawing.Point(552, 272);
-            this.buttonConnect.Name = "buttonConnect";
-            this.buttonConnect.Size = new System.Drawing.Size(162, 76);
-            this.buttonConnect.TabIndex = 4;
-            this.buttonConnect.Text = "CONNECT";
-            this.buttonConnect.UseVisualStyleBackColor = false;
-            this.buttonConnect.Click += new System.EventHandler(this.buttonConnect_Click);
+            this.buttonReady.BackColor = System.Drawing.Color.BlanchedAlmond;
+            this.buttonReady.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonReady.ForeColor = System.Drawing.Color.DarkRed;
+            this.buttonReady.Location = new System.Drawing.Point(552, 272);
+            this.buttonReady.Name = "buttonReady";
+            this.buttonReady.Size = new System.Drawing.Size(162, 76);
+            this.buttonReady.TabIndex = 4;
+            this.buttonReady.Text = "READY";
+            this.buttonReady.UseVisualStyleBackColor = false;
+            this.buttonReady.Click += new System.EventHandler(this.buttonReady_Click);
             // 
             // label1
             // 
@@ -135,7 +137,7 @@
             this.listBox1.Size = new System.Drawing.Size(10, 4);
             this.listBox1.TabIndex = 8;
             // 
-            // Form1
+            // FormRoom
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -146,14 +148,14 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.buttonConnect);
+            this.Controls.Add(this.buttonReady);
             this.Controls.Add(this.textBoxName);
             this.Controls.Add(this.textBoxServer);
             this.Controls.Add(this.textBoxLocal);
             this.Controls.Add(this.panel1);
-            this.Name = "Form1";
+            this.Name = "FormRoom";
             this.Text = "FormRoom";
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Load += new System.EventHandler(this.FormRoom_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -165,7 +167,7 @@
         private System.Windows.Forms.TextBox textBoxLocal;
         private System.Windows.Forms.TextBox textBoxServer;
         private System.Windows.Forms.TextBox textBoxName;
-        private System.Windows.Forms.Button buttonConnect;
+        private System.Windows.Forms.Button buttonReady;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;

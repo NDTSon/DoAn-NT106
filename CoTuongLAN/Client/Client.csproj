@@ -46,6 +46,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FormAuthentication.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormAuthentication.Designer.cs">
+      <DependentUpon>FormAuthentication.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormLogin.Designer.cs">
+      <DependentUpon>FormLogin.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormLose.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -57,6 +69,18 @@
     </Compile>
     <Compile Include="FormPlaying.Designer.cs">
       <DependentUpon>FormPlaying.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormRegister.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormRegister.Designer.cs">
+      <DependentUpon>FormRegister.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormReset.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormReset.Designer.cs">
+      <DependentUpon>FormReset.cs</DependentUpon>
     </Compile>
     <Compile Include="FormRoom.cs">
       <SubType>Form</SubType>
@@ -74,11 +98,23 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service.cs" />
+    <EmbeddedResource Include="FormAuthentication.resx">
+      <DependentUpon>FormAuthentication.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormLogin.resx">
+      <DependentUpon>FormLogin.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormLose.resx">
       <DependentUpon>FormLose.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormPlaying.resx">
       <DependentUpon>FormPlaying.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormRegister.resx">
+      <DependentUpon>FormRegister.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormReset.resx">
+      <DependentUpon>FormReset.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormRoom.resx">
       <DependentUpon>FormRoom.cs</DependentUpon>

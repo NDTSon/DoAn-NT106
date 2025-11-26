@@ -10,21 +10,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using Server;
 
 namespace Server
 {
     public partial class Server : Form
     {
-        //Maximum number of people allowed to enter
+        DatabaseHelper dbHelper = new DatabaseHelper();
+
         private int maxUsers;
-        //connected user
+
         System.Collections.Generic.List<User> userList = new List<User>();
-        //Number of game tables
         private int maxTables;
+
         private GameTable[] gameTable;
-        //Local IP
+
         IPAddress localAddress;
-        //listen port
+
         private int port = 51888;
         private TcpListener myListener;
         private Service service;
@@ -37,7 +39,6 @@ namespace Server
         private void Form1_Load(object sender, EventArgs e)
         {
             listBox1.HorizontalScrollbar = true;
-            // Gan localAddress dia chi ip 127.0.0.1
             localAddress = IPAddress.Parse("127.0.0.1");
             buttonStop.Enabled = false;
         }
@@ -62,18 +63,14 @@ namespace Server
             }
             textBoxMaxTables.Enabled = false;
             textBoxMaxUsers.Enabled = false;
-            //Create an array of game tables
             gameTable = new GameTable[maxTables];
             for (int i = 0; i < maxTables; i++)
             {
                 gameTable[i] = new GameTable(listBox1);
             }
-            //monitor
             myListener = new TcpListener(localAddress, port);
             myListener.Start();
             service.AddItem(string.Format("Start listening for client connections at {0}:{1}", localAddress, port));
-            //Create a thread to listen for client connection requests
-            //ThreadStart ts = new ThreadStart(ListenClientConnect);
             Thread myThread = new Thread(new ThreadStart(ListenClientConnect));
             myThread.Start();
             buttonStart.Enabled = false;
@@ -88,7 +85,6 @@ namespace Server
             {
                 userList[i].client.Close();
             }
-            // exit the listener thread
             myListener.Stop();
             buttonStart.Enabled = true;
             buttonStop.Enabled = false;
@@ -136,7 +132,6 @@ namespace Server
                 {
                     service.AddItem("Failed to receive data");
                 }
-                //If the TcpClient object is closed and the underlying socket is not closed, no exception is generated, but the read result is null
                 if (receiveString == null)
                 {
                     if (normalExit == false)
@@ -151,30 +146,49 @@ namespace Server
                 }
                 service.AddItem(string.Format("from {0}:{1}", user.userName, receiveString));
                 string[] splitString = receiveString.Split(',');
-                int tableIndex = -1; //table number
-                int side = -1;//Seat number
-                int anotherSide = -1; //The seat number of the other side
+                int tableIndex = -1;
+                int side = -1;
+                int anotherSide = -1;
                 string sendString = "";
                 string command = splitString[0].ToLower();
                 switch (command)
                 {
-                    //Login, format: Login, nickname
+
                     case "login":
+                        if (splitString.Length < 3)
+                        {
+                            service.SendToOne(user, "LoginFailed,Lỗi giao thức");
+                            exitWhile = true;
+                            break;
+                        }
+
+                        string loginUser = splitString[1];
+                        string loginPass = splitString[2];
+
                         if (userList.Count > maxUsers)
                         {
-                            sendString = "Sorry";
-                            service.SendToOne(user, sendString);
-                            service.AddItem("The number of people is full, refuse" + splitString[1] + "Enter the game room");
+                            service.SendToOne(user, "LoginFailed,Phòng đã đầy");
+                            service.AddItem("Phòng đầy, từ chối " + loginUser);
                             exitWhile = true;
                         }
                         else
                         {
-                            //Save the user's nickname to the user list
-                            user.userName = string.Format("[{0}]", splitString[1]);
-                            //Send the status of whether there are people at each table to the user
-                            sendString = "Tables," + this.GetOnlineString();
-                            service.SendToOne(user, sendString);
+                            bool isValid = dbHelper.ValidateUser(loginUser, loginPass);
 
+                            if (isValid)
+                            {
+                                user.userName = string.Format("[{0}]", loginUser);
+
+                                sendString = "Tables," + this.GetOnlineString();
+                                service.SendToOne(user, sendString);
+                                service.AddItem(string.Format("{0} đăng nhập thành công", loginUser));
+                            }
+                            else
+                            {
+                                service.SendToOne(user, "LoginFailed,Sai tài khoản hoặc mật khẩu");
+                                service.AddItem(string.Format("{0} đăng nhập thất bại (sai pass)", loginUser));
+                                exitWhile = true;
+                            }
                         }
                         break;
                     //Exit, format: Logout
@@ -189,8 +203,8 @@ namespace Server
                         side = int.Parse(splitString[2]);
                         gameTable[tableIndex].gamePlayer[side].user = user;
                         gameTable[tableIndex].gamePlayer[side].someone = true;
-                        service.AddItem(string.Format("{0} is seated at table {1}, seat {2}", user.userName,
-                                                        tableIndex + 1, side + 1));
+                        service.AddItem(string.Format("{0} ngồi vào bàn {1}, ghế {2}", user.userName, tableIndex + 1, side));
+
                         //Get the seat number of the other party
                         anotherSide = (side + 1) % 2;
                         // Determine if the other party is someone
@@ -289,6 +303,46 @@ namespace Server
                         service.SendToBoth(gameTable[tableIndex], sendString);
                         gameTable[tableIndex].gamePlayer[side].started = false;
                         gameTable[tableIndex].gamePlayer[anotherSide].started = false;
+                        break;
+
+                    case "register":
+                        try
+                        {
+                            // Client gửi: Register,username,password,fullname,question,answer
+                            // splitString[0] là lệnh "Register"
+                            if (splitString.Length < 6)
+                            {
+                                service.SendToOne(user, "RegisterFail,Thiếu thông tin");
+                                break;
+                            }
+
+                            string regUser = splitString[1];
+                            string regPass = splitString[2];
+                            string regName = splitString[3];
+                            string regQuest = splitString[4];
+                            string regAns = splitString[5];
+
+                            service.AddItem(string.Format("Đang đăng ký user: {0}", regUser));
+
+                            // Gọi hàm RegisterUser đã sửa ở DatabaseHelper
+                            bool isRegistered = dbHelper.RegisterUser(regUser, regPass, regName, regQuest, regAns);
+
+                            if (isRegistered)
+                            {
+                                service.SendToOne(user, "RegisterSuccess");
+                                service.AddItem(string.Format("Đăng ký thành công cho: {0}", regUser));
+                            }
+                            else
+                            {
+                                service.SendToOne(user, "RegisterFail,Tài khoản đã tồn tại hoặc lỗi DB");
+                                service.AddItem(string.Format("Đăng ký thất bại cho: {0}", regUser));
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            service.SendToOne(user, "RegisterFail,Lỗi xử lý server");
+                            service.AddItem("Lỗi Register: " + ex.Message);
+                        }
                         break;
                 }
             }
