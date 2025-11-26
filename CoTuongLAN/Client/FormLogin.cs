@@ -24,11 +24,10 @@ namespace Client
             f.ShowDialog();
         }
 
-        // Nếu bạn có FormAuthentication riêng, giữ nguyên logic này
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            // FormAuthentication f = new FormAuthentication();
-            // f.Show();
+            FormPreAuthentication f = new FormPreAuthentication();
+            f.Show();
         }
 
         private void btn_Login_Click(object sender, EventArgs e)
@@ -82,7 +81,7 @@ namespace Client
                 {
                     string reason = splitResponse.Length > 1 ? splitResponse[1] : "Sai tài khoản hoặc mật khẩu";
                     MessageBox.Show("Đăng nhập thất bại: " + reason, "Lỗi đăng nhập", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    client.Close(); // Đóng kết nối để người dùng thử lại
+                    client.Close();
                 }
                 else
                 {

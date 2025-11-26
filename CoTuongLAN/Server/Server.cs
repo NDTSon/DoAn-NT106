@@ -191,6 +191,46 @@ namespace Server
                             }
                         }
                         break;
+                    case "getsecurityquestion":
+                        string uAsk = splitString[1];
+                        string question = dbHelper.GetSecurityQuestion(uAsk);
+                        if (!string.IsNullOrEmpty(question))
+                        {
+                            service.SendToOne(user, "SecurityQuestion," + question);
+                        }
+                        else
+                        {
+                            service.SendToOne(user, "SecurityQuestionFail");
+                        }
+                        break;
+
+                    case "verifyanswer":
+                        string uVerify = splitString[1];
+                        string ansVerify = splitString[2];
+                        bool isCorrect = dbHelper.VerifySecurityAnswer(uVerify, ansVerify);
+
+                        if (isCorrect)
+                        {
+                            service.SendToOne(user, "AnswerCorrect");
+                        }
+                        else
+                        {
+                            service.SendToOne(user, "AnswerIncorrect");
+                        }
+                        break;
+                    case "checkuser":
+                        string uCheck = splitString[1];
+                        bool uExists = dbHelper.CheckUserExists(uCheck);
+
+                        if (uExists)
+                        {
+                            service.SendToOne(user, "UserExist");
+                        }
+                        else
+                        {
+                            service.SendToOne(user, "UserNotExist");
+                        }
+                        break;
                     //Exit, format: Logout
                     case "logout":
                         service.AddItem(string.Format("{0} exit the game room", user.userName));
@@ -304,7 +344,22 @@ namespace Server
                         gameTable[tableIndex].gamePlayer[side].started = false;
                         gameTable[tableIndex].gamePlayer[anotherSide].started = false;
                         break;
+                    case "resetpassword":
+                        string rUser = splitString[1];
+                        string rPass = splitString[2];
 
+                        bool resetOk = dbHelper.UpdatePassword(rUser, rPass);
+
+                        if (resetOk)
+                        {
+                            service.SendToOne(user, "ResetSuccess");
+                            service.AddItem(string.Format("User {0} đã đổi mật khẩu thành công", rUser));
+                        }
+                        else
+                        {
+                            service.SendToOne(user, "ResetFail");
+                        }
+                        break;
                     case "register":
                         try
                         {

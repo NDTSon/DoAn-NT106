@@ -70,6 +70,12 @@
     <Compile Include="FormPlaying.Designer.cs">
       <DependentUpon>FormPlaying.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormPreAuthentication.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormPreAuthentication.Designer.cs">
+      <DependentUpon>FormPreAuthentication.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormRegister.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -109,6 +115,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormPlaying.resx">
       <DependentUpon>FormPlaying.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormPreAuthentication.resx">
+      <DependentUpon>FormPreAuthentication.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormRegister.resx">
       <DependentUpon>FormRegister.cs</DependentUpon>

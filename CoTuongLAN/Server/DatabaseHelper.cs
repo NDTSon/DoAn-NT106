@@ -7,7 +7,54 @@ namespace Server
     public class DatabaseHelper
     {
         private string connectionString = @"Data Source=localhost\SQLEXPRESS;Initial Catalog=UserDB;Integrated Security=True;Encrypt=True;TrustServerCertificate=True";
+        public bool CheckUserExists(string username)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "SELECT COUNT(*) FROM Users WHERE Username = @user";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@user", username);
+                        int count = (int)cmd.ExecuteScalar();
+                        return count > 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Lỗi CheckUserExists: " + ex.Message);
+                    return false;
+                }
+            }
+        }
+        public bool UpdatePassword(string username, string newPassword)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
 
+                    string passwordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+                    string query = "UPDATE Users SET Password = @pass WHERE Username = @user";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@user", username);
+                        cmd.Parameters.AddWithValue("@pass", passwordHash);
+
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Lỗi UpdatePassword: " + ex.Message);
+                    return false;
+                }
+            }
+        }
         public bool ValidateUser(string username, string password)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -36,7 +83,47 @@ namespace Server
             }
             return false;
         }
-
+        public string GetSecurityQuestion(string username)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "SELECT SecurityQuestion FROM Users WHERE Username = @user";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@user", username);
+                        object result = cmd.ExecuteScalar();
+                        return result != null ? result.ToString() : null;
+                    }
+                }
+                catch { return null; }
+            }
+        }
+        public bool VerifySecurityAnswer(string username, string answer)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "SELECT SecurityAnswer FROM Users WHERE Username = @user";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@user", username);
+                        object result = cmd.ExecuteScalar();
+                        if (result != null)
+                        {
+                            string dbAnswer = result.ToString();
+                            return dbAnswer.Equals(answer, StringComparison.OrdinalIgnoreCase);
+                        }
+                    }
+                }
+                catch { }
+            }
+            return false;
+        }
         public bool RegisterUser(string username, string password, string fullname, string question, string answer)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))

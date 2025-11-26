@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.buttonConfirm = new System.Windows.Forms.Button();
-            this.tb_Confirmpassword = new System.Windows.Forms.TextBox();
-            this.tb_NewPassword = new System.Windows.Forms.TextBox();
+            this.tb_securitya = new System.Windows.Forms.TextBox();
+            this.tb_securityq = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -45,22 +45,23 @@
             this.buttonConfirm.TabIndex = 20;
             this.buttonConfirm.Text = "CONFIRM";
             this.buttonConfirm.UseVisualStyleBackColor = false;
+            this.buttonConfirm.Click += new System.EventHandler(this.buttonConfirm_Click);
             // 
-            // tb_Confirmpassword
+            // tb_securitya
             // 
-            this.tb_Confirmpassword.Font = new System.Drawing.Font("Cascadia Code SemiBold", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tb_Confirmpassword.Location = new System.Drawing.Point(346, 206);
-            this.tb_Confirmpassword.Name = "tb_Confirmpassword";
-            this.tb_Confirmpassword.Size = new System.Drawing.Size(344, 28);
-            this.tb_Confirmpassword.TabIndex = 19;
+            this.tb_securitya.Font = new System.Drawing.Font("Cascadia Code SemiBold", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tb_securitya.Location = new System.Drawing.Point(346, 206);
+            this.tb_securitya.Name = "tb_securitya";
+            this.tb_securitya.Size = new System.Drawing.Size(344, 28);
+            this.tb_securitya.TabIndex = 19;
             // 
-            // tb_NewPassword
+            // tb_securityq
             // 
-            this.tb_NewPassword.Font = new System.Drawing.Font("Cascadia Code SemiBold", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tb_NewPassword.Location = new System.Drawing.Point(346, 132);
-            this.tb_NewPassword.Name = "tb_NewPassword";
-            this.tb_NewPassword.Size = new System.Drawing.Size(344, 28);
-            this.tb_NewPassword.TabIndex = 18;
+            this.tb_securityq.Font = new System.Drawing.Font("Cascadia Code SemiBold", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tb_securityq.Location = new System.Drawing.Point(346, 132);
+            this.tb_securityq.Name = "tb_securityq";
+            this.tb_securityq.Size = new System.Drawing.Size(344, 28);
+            this.tb_securityq.TabIndex = 18;
             // 
             // label2
             // 
@@ -88,13 +89,14 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.buttonConfirm);
-            this.Controls.Add(this.tb_Confirmpassword);
-            this.Controls.Add(this.tb_NewPassword);
+            this.Controls.Add(this.tb_securitya);
+            this.Controls.Add(this.tb_securityq);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "FormAuthentication";
             this.Text = "AUTHENTICATION";
+            this.Load += new System.EventHandler(this.FormAuthentication_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -103,8 +105,8 @@
         #endregion
 
         private System.Windows.Forms.Button buttonConfirm;
-        private System.Windows.Forms.TextBox tb_Confirmpassword;
-        private System.Windows.Forms.TextBox tb_NewPassword;
+        private System.Windows.Forms.TextBox tb_securitya;
+        private System.Windows.Forms.TextBox tb_securityq;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
     }

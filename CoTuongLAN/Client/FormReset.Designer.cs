@@ -45,6 +45,7 @@
             this.buttonConfirm.TabIndex = 15;
             this.buttonConfirm.Text = "CONFIRM";
             this.buttonConfirm.UseVisualStyleBackColor = false;
+            this.buttonConfirm.Click += new System.EventHandler(this.buttonConfirm_Click);
             // 
             // tb_Confirmpassword
             // 
