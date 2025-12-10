@@ -20,6 +20,18 @@ namespace Client
 
         private void linklb_register_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
+            // 1. Lấy IP người dùng đang nhập ở ô textbox Login (txtServerIP là tên ô bạn mới tạo)
+            string ipInput = tb_ServerIP.Text.Trim();
+
+            // 2. Kiểm tra xem người dùng đã nhập IP chưa
+            if (string.IsNullOrEmpty(ipInput))
+            {
+                MessageBox.Show("Vui lòng nhập IP Server trước khi đăng ký!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return; // Dừng lại, không mở Form đăng ký
+            }
+
+            // 3. Lưu IP vào biến toàn cục để FormRegister dùng ké
+            Program.ServerIP = ipInput;
             FormRegister f = new FormRegister();
             f.ShowDialog();
         }
@@ -34,22 +46,32 @@ namespace Client
         {
             string username = tb_username.Text.Trim();
             string password = tb_pword.Text.Trim();
+            string ipInput = tb_ServerIP.Text.Trim();
 
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            // 1. Kiểm tra rỗng
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(ipInput))
             {
-                MessageBox.Show("Vui lòng nhập đầy đủ thông tin!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng nhập đầy đủ thông tin (Tài khoản, Mật khẩu, IP Server)!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
+            // 2. Kiểm tra định dạng IP
+            // IPAddress.TryParse sẽ trả về false nếu chuỗi nhập vào không phải là IP hợp lệ (vd: "abc", "999.999.999", "1.1")
+            System.Net.IPAddress ipAddress;
+            if (!System.Net.IPAddress.TryParse(ipInput, out ipAddress))
+            {
+                MessageBox.Show("Địa chỉ IP Server không hợp lệ! Vui lòng kiểm tra lại (VD: 192.168.1.5)", "Lỗi IP", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            Program.ServerIP = ipInput;
+
             try
             {
-                client = new TcpClient("127.0.0.1", 51888);
+                client = new TcpClient(Program.ServerIP, 51888);
                 NetworkStream ns = client.GetStream();
                 sr = new StreamReader(ns, Encoding.UTF8);
                 sw = new StreamWriter(ns, Encoding.UTF8) { AutoFlush = true };
 
-                // Xử lý chuỗi (Sanitize input)
-                // QUAN TRỌNG: Loại bỏ dấu phẩy để tránh lỗi giao thức
                 string safeUser = username.Replace(",", "");
                 string safePass = password.Replace(",", "");
 

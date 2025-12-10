@@ -308,10 +308,18 @@ namespace Client
             else
             {
                 if (side == -1)
+                {
                     checkbox.Enabled = !isChecked;
+                }
                 else
+                {
                     checkbox.Enabled = false;
+                }
+
                 checkbox.Checked = isChecked;
+
+                if (isChecked) checkbox.BackColor = Color.LightGray;
+                else checkbox.BackColor = Color.Transparent;
             }
         }
 
