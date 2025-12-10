@@ -20,7 +20,7 @@ namespace Server
             this.userName = "";
             NetworkStream netStream = client.GetStream();
             sr = new StreamReader(netStream, System.Text.Encoding.UTF8);
-            sw = new StreamWriter(netStream, System.Text.Encoding.UTF8);
+            sw = new StreamWriter(netStream, Encoding.UTF8) { AutoFlush = true };
         }
     }
 }
