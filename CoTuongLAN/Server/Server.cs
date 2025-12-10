@@ -11,12 +11,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
 using Server;
+using System.IO;
 
 namespace Server
 {
     public partial class FormServer : Form
     {
-        DatabaseHelper dbHelper = new DatabaseHelper();
+        DatabaseHelper dbHelper;
 
         private int maxUsers;
 
@@ -45,6 +46,7 @@ namespace Server
 
         private void buttonStart_Click(object sender, EventArgs e)
         {
+            dbHelper = new DatabaseHelper();
             if (int.TryParse(textBoxMaxTables.Text, out maxTables) == false
                 || int.TryParse(textBoxMaxUsers.Text, out maxUsers) == false)
             {
@@ -150,7 +152,6 @@ namespace Server
                 string command = splitString[0].ToLower();
                 switch (command)
                 {
-
                     case "login":
                         if (splitString.Length < 3)
                         {
@@ -159,8 +160,8 @@ namespace Server
                             break;
                         }
 
-                        string loginUser = splitString[1];
-                        string loginPass = splitString[2];
+                        string loginUser = splitString[1].Trim();
+                        string loginPass = splitString[2].Trim();
 
                         if (userList.Count > maxUsers)
                         {
@@ -349,11 +350,11 @@ namespace Server
                                 break;
                             }
 
-                            string regUser = splitString[1];
-                            string regPass = splitString[2];
-                            string regName = splitString[3];
-                            string regQuest = splitString[4];
-                            string regAns = splitString[5];
+                            string regUser = splitString[1].Trim();
+                            string regPass = splitString[2].Trim();
+                            string regName = splitString[3].Trim();
+                            string regQuest = splitString[4].Trim();
+                            string regAns = splitString[5].Trim();
 
                             service.AddItem(string.Format("Đang đăng ký người dùng: {0}", regUser));
 

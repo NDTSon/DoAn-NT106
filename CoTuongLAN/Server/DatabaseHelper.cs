@@ -1,25 +1,71 @@
 ﻿using System;
-using System.Data.SqlClient;
 using BCrypt.Net;
+using System.Data.SQLite;
+
 
 namespace Server
 {
     public class DatabaseHelper
     {
-        private string connectionString = @"Data Source=localhost\SQLEXPRESS;Initial Catalog=UserDB;Integrated Security=True;Encrypt=True;TrustServerCertificate=True";
+        private readonly string connectionString = "Data Source=User.db;Version=3";
+        
+        private readonly SQLiteConnection connection;
+
+        public DatabaseHelper()
+        {
+            connection = new SQLiteConnection(connectionString);
+            try
+            {
+                connection.Open();
+                string Create_User = @"CREATE TABLE IF NOT EXISTS Users (
+                                                Username TEXT PRIMARY KEY,
+                                                Password TEXT NOT NULL,
+                                                FullName TEXT,
+                                                SecurityQuestion TEXT,
+                                                SecurityAnswer TEXT
+                                            );";
+                using (var CreateUser = new SQLiteCommand(Create_User, connection))
+                {
+                   CreateUser.ExecuteNonQuery();
+                }
+
+                string adminPass = "123456";
+                string adminHash = BCrypt.Net.BCrypt.HashPassword(adminPass);
+
+                string insert_admin = "INSERT OR IGNORE INTO Users (Username, Password, FullName) VALUES ('admin', @pass, 'admin');";
+                using (var insertCommand = new SQLiteCommand(insert_admin, connection))
+                {
+                    insertCommand.Parameters.AddWithValue("@pass", adminHash);
+                    insertCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Lỗi kết nối DB: " + ex.Message);
+            }
+            finally
+            {
+                if (connection.State == System.Data.ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+        }
+
+
         public bool CheckUserExists(string username)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
-                    string query = "SELECT COUNT(*) FROM Users WHERE Username = @user";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    string query = "SELECT Username FROM Users WHERE Username = @user";
+                    using (SQLiteCommand cmd = new SQLiteCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@user", username);
-                        int count = (int)cmd.ExecuteScalar();
-                        return count > 0;
+                        object result = cmd.ExecuteScalar();
+                        return result != null;
                     }
                 }
                 catch (Exception ex)
@@ -31,7 +77,7 @@ namespace Server
         }
         public bool UpdatePassword(string username, string newPassword)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
             {
                 try
                 {
@@ -40,7 +86,7 @@ namespace Server
                     string passwordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
 
                     string query = "UPDATE Users SET Password = @pass WHERE Username = @user";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SQLiteCommand cmd = new SQLiteCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@user", username);
                         cmd.Parameters.AddWithValue("@pass", passwordHash);
@@ -57,13 +103,13 @@ namespace Server
         }
         public bool ValidateUser(string username, string password)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
                     string query = "SELECT Password FROM Users WHERE Username = @user";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SQLiteCommand cmd = new SQLiteCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@user", username);
                         object result = cmd.ExecuteScalar();
@@ -85,13 +131,13 @@ namespace Server
         }
         public string GetSecurityQuestion(string username)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
                     string query = "SELECT SecurityQuestion FROM Users WHERE Username = @user";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SQLiteCommand cmd = new SQLiteCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@user", username);
                         object result = cmd.ExecuteScalar();
@@ -103,13 +149,13 @@ namespace Server
         }
         public bool VerifySecurityAnswer(string username, string answer)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
                     string query = "SELECT SecurityAnswer FROM Users WHERE Username = @user";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SQLiteCommand cmd = new SQLiteCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@user", username);
                         object result = cmd.ExecuteScalar();
@@ -126,17 +172,17 @@ namespace Server
         }
         public bool RegisterUser(string username, string password, string fullname, string question, string answer)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
 
                     string checkQuery = "SELECT COUNT(*) FROM Users WHERE Username = @user";
-                    using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                    using (SQLiteCommand checkCmd = new SQLiteCommand(checkQuery, conn))
                     {
                         checkCmd.Parameters.AddWithValue("@user", username);
-                        int count = (int)checkCmd.ExecuteScalar();
+                        long count = (long)checkCmd.ExecuteScalar();
                         if (count > 0) return false;
                     }
 
@@ -144,7 +190,7 @@ namespace Server
 
                     string insertQuery = "INSERT INTO Users (Username, Password, FullName, SecurityQuestion, SecurityAnswer) VALUES (@user, @pass, @name, @quest, @ans)";
 
-                    using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
+                    using (SQLiteCommand cmd = new SQLiteCommand(insertQuery, conn))
                     {
                         cmd.Parameters.AddWithValue("@user", username);
                         cmd.Parameters.AddWithValue("@pass", passwordHash);

@@ -3,6 +3,9 @@ using System.Net.Sockets;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using System.Threading;
+using System.Threading.Tasks;
+
 
 namespace Client
 {
@@ -64,7 +67,7 @@ namespace Client
                 string safeQuestion = securityQuestion.Replace(",", ".");
                 string safeAnswer = securityAnswer.Replace(",", ".");
 
-                string registerCommand = string.Format("Register,{0},{1},{2},{3},{4}",
+                string registerCommand = string.Format("register,{0},{1},{2},{3},{4}",
                     safeUser, safePass, safeName, safeQuestion, safeAnswer);
 
                 sw.WriteLine(registerCommand);
