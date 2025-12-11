@@ -56,7 +56,7 @@ namespace Client
 
             try
             {
-                client = new TcpClient("127.0.0.1", 51888);
+                client = new TcpClient(Program.ServerIP, 51888);
                 NetworkStream ns = client.GetStream();
                 sr = new StreamReader(ns, Encoding.UTF8);
                 sw = new StreamWriter(ns, Encoding.UTF8) { AutoFlush = true };

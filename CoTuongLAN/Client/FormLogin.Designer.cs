@@ -36,6 +36,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.btn_Login = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.tb_ServerIP = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // linkLabel1
@@ -119,11 +121,31 @@
             this.btn_Login.UseVisualStyleBackColor = true;
             this.btn_Login.Click += new System.EventHandler(this.btn_Login_Click);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Cascadia Code SemiBold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(469, 31);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(90, 22);
+            this.label3.TabIndex = 19;
+            this.label3.Text = "Nhập IP:";
+            // 
+            // tb_ServerIP
+            // 
+            this.tb_ServerIP.Font = new System.Drawing.Font("Cascadia Code SemiBold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tb_ServerIP.Location = new System.Drawing.Point(565, 33);
+            this.tb_ServerIP.Name = "tb_ServerIP";
+            this.tb_ServerIP.Size = new System.Drawing.Size(182, 27);
+            this.tb_ServerIP.TabIndex = 20;
+            // 
             // FormLogin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.tb_ServerIP);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.linklb_register);
@@ -150,5 +172,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btn_Login;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox tb_ServerIP;
     }
 }
