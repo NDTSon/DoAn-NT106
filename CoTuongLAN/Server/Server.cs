@@ -32,7 +32,6 @@ namespace Server
         private TcpListener myListener;
         private Service service;
         private static readonly object _lockObject = new object();
-        //Xử lý tranh chấp ghế (Race Condition)
         public FormServer()
         {
             InitializeComponent();
@@ -42,7 +41,6 @@ namespace Server
         private void FormServer_Load(object sender, EventArgs e)
         {
             listBox1.HorizontalScrollbar = true;
-            // Cho phép kết nối từ mọi địa chỉ IP (LAN, Wifi, Internet...)
             localAddress = IPAddress.Any;
             buttonStop.Enabled = false;
         }
@@ -170,7 +168,6 @@ namespace Server
 
                         foreach (User u in userList)
                         {
-                            // Kiểm tra xem tên này đã có trong danh sách user đang kết nối chưa
                             if (u.userName == userTagToCheck)
                             {
                                 isAlreadyOnline = true;
@@ -180,11 +177,10 @@ namespace Server
 
                         if (isAlreadyOnline)
                         {
-                            // Gửi thông báo lỗi về cho Client đang cố đăng nhập
                             service.SendToOne(user, "LoginFailed,Tài khoản này đang online ở nơi khác!");
                             service.AddItem(string.Format("Từ chối đăng nhập {0} vì đã online.", loginUser));
-                            exitWhile = true; // Ngắt kết nối người thứ 2
-                            break;            // Thoát khỏi switch case
+                            exitWhile = true;
+                            break;
                         }
                         if (userList.Count > maxUsers)
                         {
@@ -261,23 +257,18 @@ namespace Server
                         tableIndex = int.Parse(splitString[1]);
                         side = int.Parse(splitString[2]);
 
-                        lock (_lockObject) // Bắt đầu khóa luồng
+                        lock (_lockObject)
                         {
-                            // Kiểm tra lại lần cuối xem ghế có trống không
                             if (gameTable[tableIndex].gamePlayer[side].someone == true)
                             {
-                                // Nếu ghế đã bị chiếm, gửi cập nhật lại bàn cờ cho User này biết đường mà lui
                                 service.SendToOne(user, "Tables," + this.GetOnlineString());
                                 service.SendToOne(user, "Message,Ghế này vừa có người nhanh tay hơn ngồi rồi!");
-                                break; // Thoát ra, không cho ngồi
+                                break;
                             }
-
-                            // Nếu ghế trống thì cho ngồi
                             gameTable[tableIndex].gamePlayer[side].user = user;
                             gameTable[tableIndex].gamePlayer[side].someone = true;
                             service.AddItem(string.Format("{0} ngồi vào bàn {1}, ghế {2}", user.userName, tableIndex + 1, side));
 
-                            // Thông báo cho đối thủ (nếu có)
                             anotherSide = (side + 1) % 2;
                             if (gameTable[tableIndex].gamePlayer[anotherSide].someone == true)
                             {
@@ -286,11 +277,8 @@ namespace Server
                                 service.SendToOne(user, sendString);
                             }
 
-                            // Gửi xác nhận cho chính người ngồi
                             sendString = string.Format("SitDown,{0},{1}", side, user.userName);
                             service.SendToBoth(gameTable[tableIndex], sendString);
-
-                            // Gửi cập nhật trạng thái ghế cho toàn bộ người chơi khác (để disable checkbox)
                             service.SendToAll(userList, "Tables," + this.GetOnlineString());
                         }
                         break;
@@ -457,21 +445,15 @@ namespace Server
 
             int otherSide = (j + 1) % 2;
 
-            // Nếu đối thủ đang chơi dở mà mình thoát -> Đối thủ thắng
             if (gameTable[i].gamePlayer[otherSide].someone == true)
             {
-                // Gửi lệnh GetUp cho đối thủ -> Client đối thủ sẽ tự xử lý thắng
-                // Format: GetUp, [Phe thoát], [Tên người thoát]
                 string msg = string.Format("GetUp,{0},{1}", j,
                     gameTable[i].gamePlayer[j].user != null ? gameTable[i].gamePlayer[j].user.userName : "Opponent");
-
                 service.SendToOne(gameTable[i].gamePlayer[otherSide].user, msg);
 
-                // Reset trạng thái bắt đầu
                 gameTable[i].gamePlayer[otherSide].started = false;
             }
 
-            // Cập nhật lại giao diện cho tất cả mọi người (ghế trống lại)
             service.SendToAll(userList, "Tables," + this.GetOnlineString());
         }
         private string GetOnlineString()

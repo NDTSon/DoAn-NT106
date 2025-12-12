@@ -31,19 +31,8 @@ namespace Client
         delegate void LabelDelegate(Label label, string str);
         delegate void ButtonDelegate(Button button, bool flag);
         LabelDelegate labelDelegate;
-
-        private void FormPlaying_Load(object sender, EventArgs e)
-        {
-            initChess();
-            initGrid();
-            labelSide0.Text = "";
-            labelSide1.Text = "";
-            labelOrder.Text = "";
-            label1.Text = "";
-            pictureBox1.Image = bm;
-        }
-
         ButtonDelegate buttonDelegate;
+
         public FormPlaying(int TableIndex, int Side, StreamWriter sw)
         {
             InitializeComponent();
@@ -64,6 +53,25 @@ namespace Client
             buttonDelegate = new ButtonDelegate(SetButton);
             service = new Client.Service(listBox1, sw);
         }
+
+        private void FormPlaying_Load(object sender, EventArgs e)
+        {
+            this.AutoSize = true;
+            this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+
+            initChess();
+
+            initGrid();
+
+            RePaint();
+
+            labelSide0.Text = "";
+            labelSide1.Text = "";
+            labelOrder.Text = "";
+            label1.Text = "";
+            pictureBox1.Image = bm;
+        }
+
         public void SetLabel(Label label, string str)
         {
             if (label.InvokeRequired)
@@ -90,6 +98,7 @@ namespace Client
 
         private void initChess()
         {
+            chess.Clear();
             chess.Add(0, "红,車,1");
             chess.Add(1, "红,马,1");
             chess.Add(2, "红,象,1");
@@ -206,13 +215,6 @@ namespace Client
             service.AddItemToListBox(str);
             initGrid();
             order = false;
-            SetButton(buttonStart, true);
-        }
-        private void buttonStart_Click(object sender, EventArgs e)
-        {
-            service.SendToServer(string.Format("Start,{0},{1}", tableIndex, side));
-            this.buttonStart.Enabled = false;
-            initGrid();
             RePaint();
         }
 
@@ -223,18 +225,17 @@ namespace Client
 
         public void RePaint()
         {
-
-
             Graphics g = Graphics.FromImage(bm);
-            Pen pen = new Pen(Color.DimGray, 2); // Đổi màu và kích thước của viền bàn cờ
-            SolidBrush boardBrush = new SolidBrush(Color.AntiqueWhite); // Đổi màu nền của bàn cờ
-            Font boardFont = new Font("Arial", 14, FontStyle.Regular); // Đổi font chữ và kích thước
+            g.Clear(Color.White);
 
-            // Vẽ viền bàn cờ
+            Pen pen = new Pen(Color.DimGray, 2);
+            SolidBrush boardBrush = new SolidBrush(Color.AntiqueWhite);
+            Font boardFont = new Font("Arial", 14, FontStyle.Regular);
+
+            g.FillRectangle(boardBrush, 0, 0, 700, 700);
+
             g.DrawRectangle(pen, baseX - binterval, baseY - binterval, 8 * interval + 2 * binterval, 9 * interval + 2 * binterval);
-            g.FillRectangle(boardBrush, baseX - binterval, baseY - binterval, 8 * interval + 2 * binterval, 9 * interval + 2 * binterval);
 
-            // Vẽ các đường kẻ bàn cờ
             for (int i = 0; i < 10; i++)
             {
                 g.DrawLine(pen, baseX, baseY + interval * i, baseX + 8 * interval, baseY + interval * i);
@@ -244,11 +245,9 @@ namespace Client
                 g.DrawLine(pen, baseX + interval * i, baseY, baseX + interval * i, baseY + 9 * interval);
             }
 
-            // Vẽ chữ "楚河" và "汉界"
             g.DrawString("楚河", boardFont, Brushes.DarkRed, baseX + 1 * interval, baseY + 4 * interval);
             g.DrawString("汉界", boardFont, Brushes.DarkRed, baseX + 5 * interval, baseY + 4 * interval);
 
-            // Vẽ lưới và chữ trên bàn cờ
             int hz = 5;
             for (int i = 0; i < 5; i++)
             {
@@ -269,23 +268,26 @@ namespace Client
                 DrawCross(g, pen, px, py, hz);
             }
 
-            // Vẽ các quân cờ
             for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 9; j++)
                 {
                     if (grid[i, j] != -1)
                     {
-                        int y = baseY + i * interval;
-                        int x = baseX + j * interval;
-                        string[] splitString = chess[grid[i, j]].Split(',');
+                        if (chess.ContainsKey(grid[i, j]))
+                        {
+                            int y = baseY + i * interval;
+                            int x = baseX + j * interval;
+                            string[] splitString = chess[grid[i, j]].Split(',');
 
-                        SolidBrush pieceBrush = splitString[0] == "红" ? new SolidBrush(Color.Red) : new SolidBrush(Color.Black); // Chọn màu sắc cho quân cờ
-                        Font pieceFont = new Font("Arial", 20, FontStyle.Bold); // Đổi font chữ và kích thước cho quân cờ
+                            SolidBrush pieceBrush = splitString[0] == "红" ? new SolidBrush(Color.Red) : new SolidBrush(Color.Black);
+                            Font pieceFont = new Font("Arial", 20, FontStyle.Bold);
 
-                        Rectangle rt = new Rectangle(x - r, y - r, 2 * r, 2 * r);
-                        g.FillEllipse(pieceBrush, rt);
-                        g.DrawString(splitString[1], pieceFont, Brushes.White, x - r + 10, y - r + 10);
+                            Rectangle rt = new Rectangle(x - r, y - r, 2 * r, 2 * r);
+                            g.FillEllipse(pieceBrush, rt);
+                            g.DrawEllipse(new Pen(Color.BurlyWood, 2), rt);
+                            g.DrawString(splitString[1], pieceFont, Brushes.White, x - r + 5, y - r + 8);
+                        }
                     }
                 }
             }
@@ -296,18 +298,14 @@ namespace Client
 
         private void FormPlaying_MouseDown(object sender, MouseEventArgs e)
         {
-            //If it is one's own move
             if (order == true)
             {
                 double xt = (e.X - baseX) / (double)interval;
                 double yt = (e.Y - baseY) / (double)interval;
-                //Convert drawing coordinates to grid coordinates
                 int y = (int)Math.Round(xt);
                 int x = (int)Math.Round(yt);
-                // in the chessboard range
                 if (!(x < 0 || x > 9 || y < 0 || y > 8))
                 {
-                    //The selected piece is your own chess piece
                     if ((grid[x, y] != -1) && ((side == 1 && grid[x, y] < 16) || (side == 0 && grid[x, y] > 15)))
                     {
                         oriX = x;
@@ -316,15 +314,12 @@ namespace Client
                         RePaint();
                         drawFrame("green", x, y);
                     }
-                    //Selected is the vacancy or the opponent's pawn
                     else
                     {
-                        //if the original position has been determined
                         if (oriX != -1 && oriY != -1)
                         {
                             endX = x;
                             endY = y;
-                            //if the rules are met
                             if (CheckRule(pick, oriX, oriY, endX, endY) == true)
                             {
                                 service.SendToServer(string.Format("ChessInfo,{0},{1},{2},{3},{4},{5},{6}", tableIndex, side, pick,
@@ -337,7 +332,6 @@ namespace Client
                                 order = false;
                                 return;
                             }
-                            //incompatible
                             else
                             {
                                 endX = -1;
@@ -367,7 +361,6 @@ namespace Client
             {
                 s = "Black";
             }
-            //Determine whether you are black or red
             if (sideString == side.ToString())
             {
                 SetLabel(labelSide1, s + labelSideString);
@@ -382,7 +375,6 @@ namespace Client
         {
             service.AddItemToListBox(string.Format("{0} says: {1}", talkMan, str));
         }
-        //Display information
         public void ShowMessage(string str)
         {
             service.AddItemToListBox(str);
@@ -411,7 +403,7 @@ namespace Client
         }
         public void ShowForm(int sideWin)
         {
-            if(this.side==sideWin)
+            if (this.side == sideWin)
             {
                 FormWin formWin = new FormWin();
                 formWin.ShowDialog();
@@ -425,22 +417,21 @@ namespace Client
 
         public void drawFrame(string color, int x, int y)
         {
-                // x = row, y = column
-                int px = baseX + y * interval; // pixel X coordinate
-                int py = baseY + x * interval; // pixel Y coordinate
-                Graphics g = Graphics.FromImage(bm);
-                if (color == "green")
-                {
-                    Pen pen = new Pen(Color.Lime, 3);
-                    g.DrawRectangle(pen, px - r, py - r, 2 * r, 2 * r);
-                }
-                else if (color == "blue")
-                {
-                    Pen pen = new Pen(Color.DeepSkyBlue, 3);
-                    g.DrawRectangle(pen, px - r, py - r, 2 * r, 2 * r);
-                }
-                g.Save();
-                pictureBox1.Image = bm;
+            int px = baseX + y * interval;
+            int py = baseY + x * interval;
+            Graphics g = Graphics.FromImage(bm);
+            if (color == "green")
+            {
+                Pen pen = new Pen(Color.Lime, 3);
+                g.DrawRectangle(pen, px - r, py - r, 2 * r, 2 * r);
+            }
+            else if (color == "blue")
+            {
+                Pen pen = new Pen(Color.DeepSkyBlue, 3);
+                g.DrawRectangle(pen, px - r, py - r, 2 * r, 2 * r);
+            }
+            g.Save();
+            pictureBox1.Image = bm;
         }
         public void ChangeChess(int cno, int x, int y)
         {
@@ -451,34 +442,31 @@ namespace Client
             if (i == 1)
             {
                 order = true;
-                SetLabel(labelOrder, "Our side moves");
+                SetLabel(labelOrder, "Lượt của bạn");
 
             }
             else
             {
                 order = false;
-                SetLabel(labelOrder, "The opponent moves");
+                SetLabel(labelOrder, "Lượt đối thủ");
 
             }
         }
-        //Update Order
         public void ChangeOrder(int i)
         {
-            //It's time for the opponent to move
             if (i == side)
             {
                 order = false;
-                SetLabel(labelOrder, "The opponent moves");
+                SetLabel(labelOrder, "Lượt đối thủ");
 
             }
             else
             {
                 order = true;
-                SetLabel(labelOrder, "Our side moves");
+                SetLabel(labelOrder, "Lượt của bạn");
 
             }
         }
-        // check if the rules are met
         private bool CheckRule(int c, int x0, int y0, int x1, int y1)
         {
             int i;
@@ -486,20 +474,16 @@ namespace Client
             int minx, maxx;
             switch (c)
             {
-                //car
                 case 0:
                 case 8:
                 case 16:
                 case 24:
-                    //same line
                     if (x0 == x1)
                     {
-                        // Determine if there is a chess piece between the two points
                         miny = y0 < y1 ? y0 : y1;
                         maxy = y0 > y1 ? y0 : y1;
                         for (i = miny + 1; i < maxy; i++)
                         {
-                            //If there is a chess piece, return false directly
                             if (grid[x0, i] != -1)
                             {
                                 return false;
@@ -510,7 +494,6 @@ namespace Client
                             return true;
                         }
                     }
-                    //same vertical line
                     else if (y0 == y1)
                     {
                         minx = x0 < x1 ? x0 : x1;
@@ -528,21 +511,17 @@ namespace Client
                         }
                     }
                     return false;
-                //horse
                 case 1:
                 case 7:
                 case 17:
                 case 23:
-                    // down day
                     if (Math.Abs(y1 - y0) == 2 && Math.Abs(x1 - x0) == 1)
                     {
-                        // don't lame
                         if (grid[x0, (y0 + y1) / 2] == -1)
                         {
                             return true;
                         }
                     }
-                    // Immediately
                     else if (Math.Abs(x1 - x0) == 2 && Math.Abs(y1 - y0) == 1)
                     {
                         if (grid[(x0 + x1) / 2, y0] == -1)
@@ -551,22 +530,18 @@ namespace Client
                         }
                     }
                     return false;
-                //image, phase
                 case 2:
                 case 6:
                 case 18:
                 case 22:
-                    //The elephant cannot cross the river
                     if (x0 == 5 && x1 == 3)
                     {
                         return false;
                     }
                     else
                     {
-                        //walk field word
                         if (Math.Abs(x1 - x0) == 2 && Math.Abs(y1 - y0) == 2)
                         {
-                            //Do not block elephant eyes
                             if (grid[(x0 + x1) / 2, (y0 + y1) / 2] == -1)
                             {
                                 return true;
@@ -574,59 +549,48 @@ namespace Client
                         }
                     }
                     return false;
-                //scholar
                 case 3:
                 case 5:
                 case 19:
                 case 21:
-                    //Scholar not out of field character grid
                     if (y1 < 3 || y1 > 5 || x1 < 7)
                     {
                         return false;
                     }
                     else
                     {
-                        // move diagonally
                         if (Math.Abs(x1 - x0) == 1 && Math.Abs(y1 - y0) == 1)
                         {
                             return true;
                         }
                     }
                     return false;
-                // will, handsome
                 case 4:
                 case 20:
-                    //The general cannot go out of the field
                     if (y1 < 3 || y1 > 5 || x1 < 7)
                     {
                         return false;
                     }
                     else
                     {
-                        // go straight
                         if ((Math.Abs(x1 - x0) == 1 && y0 == y1) || (Math.Abs(y1 - y0) == 1 && x0 == x1))
                         {
                             return true;
                         }
                     }
                     return false;
-                //gun
                 case 9:
                 case 10:
                 case 25:
                 case 26:
-                    //same line
                     if (x0 == x1)
                     {
                         miny = y0 < y1 ? y0 : y1;
                         maxy = y0 > y1 ? y0 : y1;
-                        //move
                         if (grid[x1, y1] == -1)
                         {
-                            // Determine if there is a chess piece between the two points
                             for (i = miny + 1; i < maxy; i++)
                             {
-                                //If there is a chess piece, return false directly
                                 if (grid[x0, i] != -1)
                                 {
                                     return false;
@@ -637,13 +601,11 @@ namespace Client
                                 return true;
                             }
                         }
-                        // eat child
                         else
                         {
                             int n = 0;
                             for (i = miny + 1; i < maxy; i++)
                             {
-                                //There are pieces n++
                                 if (grid[x0, i] != -1)
                                 {
                                     n++;
@@ -655,18 +617,14 @@ namespace Client
                             }
                         }
                     }
-                    //same vertical line
                     else if (y0 == y1)
                     {
                         minx = x0 < x1 ? x0 : x1;
                         maxx = x0 > x1 ? x0 : x1;
-                        //move
                         if (grid[x1, y1] == -1)
                         {
-                            // Determine if there is a chess piece between the two points
                             for (i = minx + 1; i < maxx; i++)
                             {
-                                //If there is a chess piece, return false directly
                                 if (grid[i, y0] != -1)
                                 {
                                     return false;
@@ -677,13 +635,11 @@ namespace Client
                                 return true;
                             }
                         }
-                        // eat child
                         else
                         {
                             int n = 0;
                             for (i = minx + 1; i < maxx; i++)
                             {
-                                //There are pieces n++
                                 if (grid[i, y0] != -1)
                                 {
                                     n++;
@@ -696,7 +652,6 @@ namespace Client
                         }
                     }
                     return false;
-                // soldier, pawn
                 case 11:
                 case 12:
                 case 13:
@@ -707,14 +662,12 @@ namespace Client
                 case 29:
                 case 30:
                 case 31:
-                    // Soldiers cannot retreat
                     if (x1 > x0)
                     {
                         return false;
                     }
                     else
                     {
-                        // If you haven't crossed the river, you can only move forward one space
                         if (x0 >= 5)
                         {
                             if (Math.Abs(x1 - x0) == 1 && y0 == y1)
@@ -722,7 +675,6 @@ namespace Client
                                 return true;
                             }
                         }
-                        //Crossing the river, you can move forward, left, right
                         else
                         {
                             if ((Math.Abs(x1 - x0) == 1 && y0 == y1) || (Math.Abs(y1 - y0) == 1 && x0 == x1))

@@ -36,18 +36,22 @@
             // tb_username
             // 
             this.tb_username.Font = new System.Drawing.Font("Cascadia Code SemiBold", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tb_username.Location = new System.Drawing.Point(359, 58);
+            this.tb_username.ForeColor = System.Drawing.Color.DarkRed;
+            this.tb_username.Location = new System.Drawing.Point(415, 40);
+            this.tb_username.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tb_username.Name = "tb_username";
-            this.tb_username.Size = new System.Drawing.Size(344, 28);
+            this.tb_username.Size = new System.Drawing.Size(514, 41);
             this.tb_username.TabIndex = 20;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Cascadia Code SemiBold", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(112, 61);
+            this.label1.ForeColor = System.Drawing.Color.DarkRed;
+            this.label1.Location = new System.Drawing.Point(33, 40);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(241, 24);
+            this.label1.Size = new System.Drawing.Size(374, 39);
             this.label1.TabIndex = 19;
             this.label1.Text = "Enter your username :";
             // 
@@ -55,9 +59,11 @@
             // 
             this.buttonConfirm.BackColor = System.Drawing.SystemColors.Control;
             this.buttonConfirm.Font = new System.Drawing.Font("Cascadia Code SemiBold", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonConfirm.Location = new System.Drawing.Point(359, 125);
+            this.buttonConfirm.ForeColor = System.Drawing.Color.DarkRed;
+            this.buttonConfirm.Location = new System.Drawing.Point(465, 114);
+            this.buttonConfirm.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonConfirm.Name = "buttonConfirm";
-            this.buttonConfirm.Size = new System.Drawing.Size(137, 57);
+            this.buttonConfirm.Size = new System.Drawing.Size(206, 89);
             this.buttonConfirm.TabIndex = 21;
             this.buttonConfirm.Text = "CONFIRM";
             this.buttonConfirm.UseVisualStyleBackColor = false;
@@ -65,12 +71,14 @@
             // 
             // FormPreAuthentication
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 253);
+            this.BackColor = System.Drawing.Color.FloralWhite;
+            this.ClientSize = new System.Drawing.Size(993, 246);
             this.Controls.Add(this.buttonConfirm);
             this.Controls.Add(this.tb_username);
             this.Controls.Add(this.label1);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "FormPreAuthentication";
             this.Text = "AUTHENTICATION";
             this.ResumeLayout(false);

@@ -117,7 +117,6 @@ namespace Server
                         if (result != null)
                         {
                             string dbPasswordHash = result.ToString();
-                            // Kiểm tra mật khẩu băm
                             return BCrypt.Net.BCrypt.Verify(password, dbPasswordHash);
                         }
                     }

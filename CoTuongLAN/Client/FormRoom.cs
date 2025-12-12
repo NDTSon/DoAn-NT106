@@ -318,7 +318,7 @@ namespace Client
 
                 checkbox.Checked = isChecked;
 
-                if (isChecked) checkbox.BackColor = Color.LightGray;
+                if (isChecked) checkbox.BackColor = Color.Transparent;
                 else checkbox.BackColor = Color.Transparent;
             }
         }

@@ -39,9 +39,11 @@
             // 
             this.buttonConfirm.BackColor = System.Drawing.SystemColors.Control;
             this.buttonConfirm.Font = new System.Drawing.Font("Cascadia Code SemiBold", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonConfirm.Location = new System.Drawing.Point(346, 261);
+            this.buttonConfirm.ForeColor = System.Drawing.Color.DarkRed;
+            this.buttonConfirm.Location = new System.Drawing.Point(517, 228);
+            this.buttonConfirm.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonConfirm.Name = "buttonConfirm";
-            this.buttonConfirm.Size = new System.Drawing.Size(137, 57);
+            this.buttonConfirm.Size = new System.Drawing.Size(206, 89);
             this.buttonConfirm.TabIndex = 20;
             this.buttonConfirm.Text = "CONFIRM";
             this.buttonConfirm.UseVisualStyleBackColor = false;
@@ -50,26 +52,32 @@
             // tb_securitya
             // 
             this.tb_securitya.Font = new System.Drawing.Font("Cascadia Code SemiBold", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tb_securitya.Location = new System.Drawing.Point(346, 206);
+            this.tb_securitya.ForeColor = System.Drawing.Color.DarkRed;
+            this.tb_securitya.Location = new System.Drawing.Point(455, 152);
+            this.tb_securitya.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tb_securitya.Name = "tb_securitya";
-            this.tb_securitya.Size = new System.Drawing.Size(344, 28);
+            this.tb_securitya.Size = new System.Drawing.Size(514, 41);
             this.tb_securitya.TabIndex = 19;
             // 
             // tb_securityq
             // 
             this.tb_securityq.Font = new System.Drawing.Font("Cascadia Code SemiBold", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tb_securityq.Location = new System.Drawing.Point(346, 132);
+            this.tb_securityq.ForeColor = System.Drawing.Color.DarkRed;
+            this.tb_securityq.Location = new System.Drawing.Point(455, 36);
+            this.tb_securityq.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tb_securityq.Name = "tb_securityq";
-            this.tb_securityq.Size = new System.Drawing.Size(344, 28);
+            this.tb_securityq.Size = new System.Drawing.Size(514, 41);
             this.tb_securityq.TabIndex = 18;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Cascadia Code SemiBold", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(110, 209);
+            this.label2.ForeColor = System.Drawing.Color.DarkRed;
+            this.label2.Location = new System.Drawing.Point(81, 152);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(153, 24);
+            this.label2.Size = new System.Drawing.Size(238, 39);
             this.label2.TabIndex = 17;
             this.label2.Text = "Your answer :";
             // 
@@ -77,23 +85,27 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Cascadia Code SemiBold", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(110, 135);
+            this.label1.ForeColor = System.Drawing.Color.DarkRed;
+            this.label1.Location = new System.Drawing.Point(81, 36);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(230, 24);
+            this.label1.Size = new System.Drawing.Size(357, 39);
             this.label1.TabIndex = 16;
             this.label1.Text = "Security question : ";
             // 
             // FormAuthentication
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.BackColor = System.Drawing.Color.FloralWhite;
+            this.ClientSize = new System.Drawing.Size(1084, 360);
             this.Controls.Add(this.buttonConfirm);
             this.Controls.Add(this.tb_securitya);
             this.Controls.Add(this.tb_securityq);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "FormAuthentication";
             this.Text = "AUTHENTICATION";
             this.Load += new System.EventHandler(this.FormAuthentication_Load);
