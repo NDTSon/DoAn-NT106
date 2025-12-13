@@ -20,17 +20,17 @@ namespace Client
 
         private void linklb_register_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            // 1. Lấy IP người dùng đang nhập ở ô textbox Login (txtServerIP là tên ô bạn mới tạo)
+            //Lấy IP người dùng đang nhập ở ô textbox Login
             string ipInput = tb_ServerIP.Text.Trim();
 
-            // 2. Kiểm tra xem người dùng đã nhập IP chưa
+            //Kiểm tra xem người dùng đã nhập IP chưa
             if (string.IsNullOrEmpty(ipInput))
             {
                 MessageBox.Show("Vui lòng nhập IP Server trước khi đăng ký!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return; // Dừng lại, không mở Form đăng ký
             }
 
-            // 3. Lưu IP vào biến toàn cục để FormRegister dùng ké
+            //Lưu IP vào biến toàn cục
             Program.ServerIP = ipInput;
             FormRegister f = new FormRegister();
             f.ShowDialog();
@@ -48,19 +48,18 @@ namespace Client
             string password = tb_pword.Text.Trim();
             string ipInput = tb_ServerIP.Text.Trim();
 
-            // 1. Kiểm tra rỗng
+            //Kiểm tra rỗng
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(ipInput))
             {
                 MessageBox.Show("Vui lòng nhập đầy đủ thông tin (Tài khoản, Mật khẩu, IP Server)!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // 2. Kiểm tra định dạng IP
-            // IPAddress.TryParse sẽ trả về false nếu chuỗi nhập vào không phải là IP hợp lệ (vd: "abc", "999.999.999", "1.1")
+            //Kiểm tra định dạng IP
             System.Net.IPAddress ipAddress;
             if (!System.Net.IPAddress.TryParse(ipInput, out ipAddress))
             {
-                MessageBox.Show("Địa chỉ IP Server không hợp lệ! Vui lòng kiểm tra lại (VD: 192.168.1.5)", "Lỗi IP", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Địa chỉ IP Server không hợp lệ! Vui lòng kiểm tra lại.", "Lỗi IP", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             Program.ServerIP = ipInput;
