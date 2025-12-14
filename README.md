@@ -1,3 +1,16 @@
+## Đồ Án Lập Trình Mạng: Game Cờ Tướng Online (LAN)
+- Dự án xây dựng hệ thống Game Cờ Tướng thi đấu qua mạng LAN/Localhost dựa trên mô hình Client-Server, sử dụng giao thức TCP/IP để truyền tải dữ liệu thời gian thực.
+
+## Thông tin Nhóm 07
+| Chức vụ | MSSV | Họ và tên | Username |
+| :--- | :--- | :--- | :--- |
+| Thành viên | 22520973 | Ngô Vũ Hạo Nguyên | []() |
+| Nhóm trưởng | 22521251 | Nguyễn Duy Thế Sơn | [NDTSon](https://github.com/NDTSon) |
+| Thành viên | 24520262 | Nguyễn Tấn Danh | [NTDanh-it](https://github.com/NTDanh-it) |
+| Thành viên | 24521230 | Hứa Thiện Nhân | [nhanhtn](https://github.com/nhanhtn) |
+| Thành viên | 24521940 | Phan Lê Tuấn | [SuReii86](https://github.com/SuReii86) |
+
+
 ## Nội dung chính
 - Thư mục chính của dự án: `CoTuongLAN/` (chứa `Client/`, `Server/` và các file solution/project)
 
