@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace Client
 {
@@ -26,6 +27,7 @@ namespace Client
             TcpClient client = null;
             try
             {
+                Debug.WriteLine(Program.ServerIP);
                 client = new TcpClient(Program.ServerIP, 51888);
                 NetworkStream ns = client.GetStream();
                 StreamReader sr = new StreamReader(ns, Encoding.UTF8);
@@ -53,10 +55,10 @@ namespace Client
                     MessageBox.Show("Lỗi Server: " + response);
                 }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi kết nối: " + ex.Message);
-            }
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show("Lỗi kết nối: " + ex.Message);
+            //}
             finally
             {
                 if (client != null) client.Close();

@@ -10,7 +10,7 @@ namespace Client
     internal static class Program
     {
         public static IPAddress IP = IPAddress.Any;
-        public static string ServerIP = IP.ToString();
+        public static string ServerIP = "";
         /// <summary>
         /// The main entry point for the application.
         /// </summary>

@@ -158,6 +158,7 @@
             this.tb_ServerIP.Name = "tb_ServerIP";
             this.tb_ServerIP.Size = new System.Drawing.Size(271, 39);
             this.tb_ServerIP.TabIndex = 20;
+            this.tb_ServerIP.TextChanged += new System.EventHandler(this.tb_ServerIP_TextChanged);
             // 
             // FormLogin
             // 

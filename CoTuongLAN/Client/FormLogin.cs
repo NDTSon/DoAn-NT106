@@ -109,5 +109,10 @@ namespace Client
                 if (client != null) client.Close();
             }
         }
+
+        private void tb_ServerIP_TextChanged(object sender, EventArgs e)
+        {
+            Program.ServerIP = tb_ServerIP.Text.Trim();
+        }
     }
 }
