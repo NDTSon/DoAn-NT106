@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -8,7 +9,8 @@ namespace Client
 {
     internal static class Program
     {
-        public static string ServerIP = "127.0.0.1";
+        public static IPAddress IP = IPAddress.Any;
+        public static string ServerIP = IP.ToString();
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
