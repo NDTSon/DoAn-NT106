@@ -4,7 +4,7 @@
 ## Thông tin Nhóm 07
 | Chức vụ | MSSV | Họ và tên | Username |
 | :--- | :--- | :--- | :--- |
-| Thành viên | 22520973 | Ngô Vũ Hạo Nguyên | []() |
+| Thành viên | 22520973 | Ngô Vũ Hạo Nguyên | [hnguyen04](https://github.com/ngovuhaonguyen04) |
 | Nhóm trưởng | 22521251 | Nguyễn Duy Thế Sơn | [NDTSon](https://github.com/NDTSon) |
 | Thành viên | 24520262 | Nguyễn Tấn Danh | [NTDanh-it](https://github.com/NTDanh-it) |
 | Thành viên | 24521230 | Hứa Thiện Nhân | [nhanhtn](https://github.com/nhanhtn) |
