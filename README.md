@@ -1,4 +1,4 @@
-## Đồ Án Lập Trình Mạng: Game Cờ Tướng Online (LAN)
+## Đồ Án Lập Trình Mạng: Game Cờ Tướng (LAN)
 - Dự án xây dựng hệ thống Game Cờ Tướng thi đấu qua mạng LAN/Localhost dựa trên mô hình Client-Server, sử dụng giao thức TCP/IP để truyền tải dữ liệu thời gian thực.
 
 ## Thông tin Nhóm 07
